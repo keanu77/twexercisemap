@@ -4,15 +4,151 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#ff6b35" />
-<title>臺灣運動地圖｜從 22 縣市資料看臺灣人的運動習慣</title>
-<meta name="description" content="從運動部 102–112 年運動現況調查資料，視覺化呈現臺灣 22 縣市的運動參與、規律運動比例、熱門運動項目與歷年趨勢。">
-<meta property="og:title" content="臺灣運動地圖｜22 縣市運動習慣資料視覺化">
-<meta property="og:description" content="從 22 縣市運動參與資料，看見臺灣人的運動習慣與城市差異。">
-<meta property="og:type" content="website">
+<meta name="color-scheme" content="light" />
+
+<!-- Primary SEO -->
+<title>臺灣運動地圖｜22 縣市規律運動比例、熱門運動、歷年趨勢視覺化</title>
+<meta name="description" content="基於運動部 102–112 年（2013–2023）40,669 筆運動現況調查資料，視覺化呈現臺灣 22 縣市規律運動率、4 種運動強度、熱門運動 Top 20 與歷年趨勢動畫。全國規律運動率 35.0%，花蓮縣 40.8% 居冠。" />
+<meta name="keywords" content="臺灣運動地圖,運動現況調查,規律運動比例,運動部開放資料,縣市運動率,健走比例,WHO運動建議,運動醫學,公共衛生,資料視覺化,22縣市排名" />
+<meta name="author" content="吳易澄醫師 · 聯新國際醫院運動醫學科" />
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+<meta name="googlebot" content="index, follow" />
+<link rel="canonical" href="https://twexercisemap.sportsmedicine.tw/" />
+<link rel="alternate" hreflang="zh-Hant" href="https://twexercisemap.sportsmedicine.tw/" />
+<link rel="alternate" hreflang="x-default" href="https://twexercisemap.sportsmedicine.tw/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="臺灣運動地圖" />
+<meta property="og:title" content="臺灣運動地圖｜22 縣市運動習慣資料視覺化" />
+<meta property="og:description" content="從 22 縣市運動參與資料，看見臺灣人的運動習慣與城市差異。全國規律運動率 35.0%，花蓮縣 40.8% 居冠。基於運動部 102–112 年開放資料。" />
+<meta property="og:url" content="https://twexercisemap.sportsmedicine.tw/" />
+<meta property="og:locale" content="zh_TW" />
+<meta property="og:image" content="https://twexercisemap.sportsmedicine.tw/og-image.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="臺灣運動地圖 - 22 縣市運動習慣資料視覺化儀表板" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="臺灣運動地圖｜22 縣市運動習慣資料視覺化" />
+<meta name="twitter:description" content="全國規律運動率僅 35%、花蓮 40.8% 居冠、雲林 31.9% 居末。基於運動部 102–112 年開放資料的互動式視覺化。" />
+<meta name="twitter:image" content="https://twexercisemap.sportsmedicine.tw/og-image.png" />
+
+<!-- Favicon (inline SVG, no external request) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff6b35'/%3E%3Cstop offset='100%25' stop-color='%237c4dff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M22 78V32m0 46L42 56M22 32L42 52m0 0v26m0-26l18-20m0 46V46m0 32l18-14M60 32v32' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ff6b35'/%3E%3Cstop offset='100%25' stop-color='%237c4dff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Cpath d='M22 78V32m0 46L42 56M22 32L42 52m0 0v26m0-26l18-20m0 46V46m0 32l18-14M60 32v32' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+
+<!-- Performance hints -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link href="./dist/output.css?v=20260517d" rel="stylesheet">
+<link href="./dist/output.css?v=20260518" rel="stylesheet">
+
+<!-- Structured Data: WebSite + Dataset + FAQ + BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://twexercisemap.sportsmedicine.tw/#website",
+      "url": "https://twexercisemap.sportsmedicine.tw/",
+      "name": "臺灣運動地圖",
+      "description": "臺灣 22 縣市運動習慣與規律運動比例之互動式資料視覺化",
+      "inLanguage": "zh-Hant",
+      "publisher": {
+        "@id": "https://twexercisemap.sportsmedicine.tw/#org"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://twexercisemap.sportsmedicine.tw/#org",
+      "name": "吳易澄醫師 · 運動醫學科",
+      "url": "https://sportsmedicine.tw/",
+      "sameAs": ["https://voting-topic.sportsmedicine.tw/"]
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://twexercisemap.sportsmedicine.tw/#dataset",
+      "name": "臺灣 22 縣市規律運動現況視覺化資料集",
+      "description": "整合運動部「運動城市調查各縣市規律運動現況」民國 102–112 年（2013–2023）共 40,669 筆民意調查資料，涵蓋 4 種運動強度定義（7100/7230/7330/7333）、22 縣市排名、歷年趨勢、熱門運動項目 Top 20。",
+      "keywords": ["臺灣運動", "規律運動", "縣市排名", "運動現況調查", "WHO 運動建議", "運動醫學"],
+      "license": "https://data.gov.tw/license",
+      "isAccessibleForFree": true,
+      "url": "https://twexercisemap.sportsmedicine.tw/",
+      "creator": {
+        "@type": "GovernmentOrganization",
+        "name": "中華民國運動部",
+        "url": "https://www.sa.gov.tw/"
+      },
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "臺灣（22 縣市）"
+      },
+      "temporalCoverage": "2013/2023",
+      "variableMeasured": [
+        {"@type": "PropertyValue", "name": "規律運動比例 (7333)", "unitText": "%"},
+        {"@type": "PropertyValue", "name": "每週運動 3 次以上比例 (7230)", "unitText": "%"},
+        {"@type": "PropertyValue", "name": "熱門運動項目占比", "unitText": "%"}
+      ],
+      "distribution": [{
+        "@type": "DataDownload",
+        "encodingFormat": "CSV",
+        "contentUrl": "https://data.gov.tw/dataset/24375"
+      }]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://twexercisemap.sportsmedicine.tw/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "臺灣全國規律運動率是多少？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "根據運動部民國 112 年（2023）運動現況調查，臺灣達到「規律運動」標準（每週至少 3 次、每次 30 分鐘以上、心率達 130 bpm 或會喘）的人口比例為 35.0%。從民國 102 年的 31.3% 緩慢成長至 112 年的 35.0%，十年成長 3.7 個百分點。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "臺灣哪個縣市規律運動率最高？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "民國 112 年（2023）資料中，花蓮縣以 40.8% 的規律運動率位居全國第一，宜蘭縣 39.8% 第二，連江縣 39.4% 第三，臺北市 39.2% 第四。墊底為雲林縣 31.9%。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "什麼是 7100、7230、7330、7333？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "這是運動部運動現況調查使用的 4 種運動強度分級。7100：有運動（任何頻率）；7230：每週運動 3 次以上；7330：再加每次運動 30 分鐘以上；7333：規律運動，再加心率達 130 bpm 或會喘。7333 為對應 WHO 國際建議的最嚴格定義。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "臺灣人最愛從事哪些運動？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "依運動部 112 年調查，臺灣民眾從事比例最高的運動項目依序為：散步/健走 57.1%、慢跑 18.7%、爬山 12.3%、騎自行車 10.7%、在家健身訓練 10.7%、伸展操/瑜珈 9.4%、羽球 9.1%、籃球 8.6%。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "這份資料的限制是什麼？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "資料來自電話訪問之自我報告，可能存在社會期許偏誤。民國 108–110 年因問卷設計變動，部分項目數值偏低；111 年起改採「過去 12 個月內曾從事」之口徑，故跨年度比較須謹慎。各縣市抽樣樣本有限，95% 信賴區間下約 ±3–5 個百分點誤差。資料僅呈現相關性，不代表因果，亦非醫療診斷依據。"
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
   :root {
@@ -192,11 +328,31 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Skip to main content */
+  .skip-link {
+    position: absolute; top: -100px; left: 8px; z-index: 100;
+    background: #ff6b35; color: #fff; padding: 8px 16px;
+    border-radius: 8px; font-weight: 700; text-decoration: none;
+    transition: top .2s ease;
+  }
+  .skip-link:focus { top: 8px; }
+
+  /* Print stylesheet */
+  @media print {
+    .tabs-wrap, .seg, #play-btn, #race-play, #county-picker, #sports-picker,
+    .group-chip, #county-search, #clear-counties, .drawer, .drawer-mask { display: none !important; }
+    .tab-panel { display: block !important; page-break-inside: avoid; }
+    body { background: #fff !important; }
+    .panel { box-shadow: none !important; border-color: #ccc !important; }
+  }
 </style>
 </head>
 <body class="grid-bg min-h-screen">
 
-  <div class="max-w-[1280px] mx-auto px-5 sm:px-8 py-12">
+  <a href="#main-content" class="skip-link">跳至主要內容</a>
+
+  <main id="main-content" class="max-w-[1280px] mx-auto px-5 sm:px-8 py-12">
 
     <!-- Hero -->
     <header class="mb-12 max-w-3xl">
@@ -504,6 +660,56 @@
       </div>
     </details>
 
+    <!-- SEO/AEO 友善摘要區（給搜尋引擎與 AI 爬蟲讀的關鍵資訊） -->
+    <section class="mt-8 panel p-6 md:p-8" aria-labelledby="about-heading">
+      <p class="eyebrow text-orange-600 mb-2">ABOUT THIS PROJECT</p>
+      <h2 id="about-heading" class="section-title text-2xl mb-4">關於臺灣運動地圖</h2>
+
+      <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed space-y-4">
+        <p>
+          <strong class="text-slate-900">臺灣運動地圖</strong>是一個基於<a href="https://data.gov.tw/dataset/24375" target="_blank" rel="noopener" class="text-orange-600 font-semibold hover:underline">中華民國運動部「運動城市調查各縣市規律運動現況」</a>開放資料集打造的互動式視覺化儀表板。資料涵蓋民國 <span class="num">102–112</span> 年（2013–2023），共 <span class="num">40,669</span> 筆民意調查紀錄，呈現臺灣 <span class="num">22</span> 縣市的運動參與、規律運動比例、熱門運動項目與歷年趨勢。
+        </p>
+
+        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">關鍵發現（民國 112 年）</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li>全國規律運動率（7333 嚴格定義）為 <strong class="num text-orange-600">35.0%</strong>，較民國 102 年（31.3%）成長 3.7 個百分點。</li>
+          <li><strong class="text-slate-900">花蓮縣</strong>以 <strong class="num text-orange-600">40.8%</strong> 居全國之冠，<strong class="text-slate-900">雲林縣</strong> <strong class="num">31.9%</strong> 居末，差距近 9 個百分點。</li>
+          <li>全國 <strong class="num">76.6%</strong> 民眾「有運動」，但只有 <strong class="num">35%</strong> 達到 WHO 國際建議標準。</li>
+          <li>最熱門運動項目為<strong class="text-slate-900">散步／健走</strong>（<span class="num">57.1%</span>）、<strong class="text-slate-900">慢跑</strong>（<span class="num">18.7%</span>）、<strong class="text-slate-900">爬山</strong>（<span class="num">12.3%</span>）。</li>
+        </ul>
+
+        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">運動強度 4 種分級</h3>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          <li><strong class="num text-slate-800">7100</strong> 有運動 — 任何頻率（76.6%）</li>
+          <li><strong class="num text-slate-800">7230</strong> 每週運動 ≥ 3 次（59.7%）</li>
+          <li><strong class="num text-slate-800">7330</strong> 加每次 ≥ 30 分鐘（45.7%）</li>
+          <li><strong class="num text-orange-600">7333</strong> 規律運動 — 加心率 130 bpm 或會喘（35.0%，對應 WHO 國際建議）</li>
+        </ul>
+
+        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">常見問題</h3>
+        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+          <summary class="font-semibold text-slate-800 text-sm">臺灣全國規律運動率是多少？</summary>
+          <p class="mt-2 text-sm text-slate-600">民國 112 年全國達到「規律運動」標準（每週 ≥ 3 次、每次 ≥ 30 分鐘、心率達 130 bpm 或會喘）的人口為 <span class="num font-semibold">35.0%</span>。</p>
+        </details>
+        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+          <summary class="font-semibold text-slate-800 text-sm">臺灣哪個縣市規律運動率最高？</summary>
+          <p class="mt-2 text-sm text-slate-600">花蓮縣 <span class="num font-semibold">40.8%</span> 居冠，其次為宜蘭縣 39.8%、連江縣 39.4%、臺北市 39.2%。</p>
+        </details>
+        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+          <summary class="font-semibold text-slate-800 text-sm">臺灣人最愛從事哪些運動？</summary>
+          <p class="mt-2 text-sm text-slate-600">前 5 名依序為：散步／健走（57.1%）、慢跑（18.7%）、爬山（12.3%）、騎自行車（10.7%）、在家健身訓練（10.7%）。</p>
+        </details>
+        <details class="bg-slate-50 rounded-lg p-3 cursor-pointer">
+          <summary class="font-semibold text-slate-800 text-sm">這份資料的限制是什麼？</summary>
+          <p class="mt-2 text-sm text-slate-600">資料採自我報告，可能存在社會期許偏誤；民國 108–110 年問卷口徑變動；95% 信賴區間下約 ±3–5pp 抽樣誤差；資料僅呈現相關性不代表因果。</p>
+        </details>
+
+        <p class="text-xs text-slate-500 mt-5">
+          資料引用：中華民國運動部開放資料平台 · dataset 24375 · 政府資料開放授權條款 v1.0
+        </p>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="mt-8 pt-6 border-t border-orange-100">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-slate-500">
@@ -514,7 +720,7 @@
       </div>
     </footer>
 
-  </div>
+  </main>
 
   <!-- County detail drawer -->
   <div id="drawer-mask" class="drawer-mask" aria-hidden="true"></div>
