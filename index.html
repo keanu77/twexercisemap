@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#ff6b35" />
+<title>臺灣運動城市調查 · 互動式儀表板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --c-brand: #ff6b35;
+    --c-brand-dark: #ea580c;
+    --c-purple: #7c4dff;
+    --c-green: #2eb872;
+    --c-blue: #1877f2;
+    --c-pink: #f43f5e;
+    --c-amber: #f59e0b;
+    --c-ink: #0f172a;
+    --c-mute: #64748b;
+    --c-line: #e2e8f0;
+    --c-cream: #fffaf5;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Fira Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+    color: var(--c-ink);
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  .num, .tabular { font-family: 'Fira Code', 'Noto Sans TC', monospace; font-variant-numeric: tabular-nums; }
+  .chart { width: 100%; height: 520px; }
+  .grid-bg {
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,107,53,.07), transparent 50%),
+      radial-gradient(circle at 80% 0%, rgba(124,77,255,.06), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(24,119,242,.05), transparent 55%),
+      linear-gradient(180deg, #fffaf5 0%, #fff7f2 100%);
+  }
+
+  /* Eyebrow label */
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase;
+    font-family: 'Fira Sans', sans-serif;
+  }
+
+  /* Section card */
+  .panel {
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid #fed7aa;
+    border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(15,23,42,.04), 0 8px 32px -12px rgba(15,23,42,.08);
+  }
+
+  /* KPI card */
+  .kpi {
+    position: relative; overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--c-line);
+    border-radius: 16px;
+    padding: 18px 20px;
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .kpi:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -8px rgba(15,23,42,.12); }
+  .kpi::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent, var(--c-brand));
+  }
+  .kpi-spark {
+    position: absolute; right: 14px; top: 14px;
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft, rgba(255,107,53,.1));
+    color: var(--accent, var(--c-brand));
+  }
+
+  /* Tabs */
+  .tabs-wrap {
+    display: inline-flex; padding: 4px; background: #fff;
+    border: 1px solid var(--c-line); border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  }
+  .tab-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 600; color: var(--c-mute);
+    cursor: pointer; transition: all .2s ease;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--c-ink); background: #fafafa; }
+  .tab-btn.active { color: #fff; box-shadow: 0 4px 14px -2px var(--accent-shadow, rgba(255,107,53,.4)); }
+  .tab-btn[data-tab="ranking"].active { background: linear-gradient(135deg, #ff6b35, #f43f5e); --accent-shadow: rgba(255,107,53,.4); }
+  .tab-btn[data-tab="trend"].active { background: linear-gradient(135deg, #7c4dff, #a855f7); --accent-shadow: rgba(124,77,255,.4); }
+  .tab-btn[data-tab="sports"].active { background: linear-gradient(135deg, #2eb872, #10b981); --accent-shadow: rgba(46,184,114,.4); }
+  .tab-btn[data-tab="levels"].active { background: linear-gradient(135deg, #1877f2, #06b6d4); --accent-shadow: rgba(24,119,242,.4); }
+  .tab-btn svg { width: 14px; height: 14px; }
+
+  /* Level segmented */
+  .seg {
+    display: inline-flex; padding: 3px; background: #f8fafc;
+    border: 1px solid var(--c-line); border-radius: 10px;
+  }
+  .level-btn {
+    padding: 6px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600;
+    color: var(--c-mute); cursor: pointer; transition: all .2s ease;
+    font-variant-numeric: tabular-nums;
+  }
+  .level-btn:hover { color: var(--c-ink); }
+  .level-btn.active { background: #fff; color: var(--c-brand-dark); box-shadow: 0 1px 4px rgba(15,23,42,.08); }
+
+  /* Pills */
+  .checkbox-pill {
+    cursor: pointer; transition: all .15s ease;
+    user-select: none;
+  }
+  .checkbox-pill input { display: none; }
+  .checkbox-pill:hover { background: #f8fafc; }
+
+  /* Select element style */
+  .select-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px !important;
+  }
+
+  /* Section header eyebrow + h2 */
+  .section-title {
+    font-family: 'Fira Sans', 'Noto Sans TC', sans-serif;
+    font-weight: 700; letter-spacing: -0.01em;
+  }
+
+  /* Focus rings */
+  *:focus-visible {
+    outline: 2px solid var(--c-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Gradient title (orange → purple) */
+  .display-title {
+    background: linear-gradient(120deg, #ff6b35 0%, #f43f5e 45%, #7c4dff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -0.02em;
+  }
+
+  /* Group chip */
+  .group-chip {
+    padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    color: var(--c-mute); background: #fff; border: 1px solid var(--c-line);
+    cursor: pointer; transition: all .15s ease;
+  }
+  .group-chip:hover { color: var(--c-ink); border-color: #cbd5e1; }
+  .group-chip.active { background: var(--c-ink); color: #fff; border-color: var(--c-ink); }
+
+  /* Drawer */
+  .drawer-mask {
+    position: fixed; inset: 0; background: rgba(15,23,42,.5);
+    backdrop-filter: blur(4px); z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease;
+  }
+  .drawer-mask.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 51;
+    width: min(440px, 100vw); background: #fff;
+    box-shadow: -8px 0 40px rgba(15,23,42,.18);
+    transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  /* Kbd */
+  kbd {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 20px; padding: 2px 6px; border-radius: 4px;
+    background: #f1f5f9; border: 1px solid #cbd5e1; border-bottom-width: 2px;
+    font-family: 'Fira Code', monospace; font-size: 11px; font-weight: 600; color: #334155;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body class="grid-bg min-h-screen">
+
+  <div class="max-w-[1280px] mx-auto px-5 sm:px-8 py-12">
+
+    <!-- Hero -->
+    <header class="mb-12 max-w-3xl">
+      <h1 class="display-title text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] mb-5">
+        臺灣運動地圖
+      </h1>
+      <p class="text-slate-600 text-lg sm:text-xl leading-relaxed">
+        從 <span class="num text-slate-700 font-bold">22</span> 縣市運動參與資料，看見臺灣人的運動習慣與城市差異。
+      </p>
+    </header>
+
+    <!-- KPI Strip (clickable to jump to relevant tab) -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10" aria-label="關鍵指標">
+      <button type="button" class="kpi text-left kpi-jump" data-jump="ranking" style="--accent:#ff6b35;--accent-soft:rgba(255,107,53,.12)" aria-label="跳至縣市排名">
+        <div class="kpi-spark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <p class="eyebrow text-orange-600 mb-2">全國規律運動率</p>
+        <p class="num text-3xl font-bold text-slate-900 leading-none">35.0<span class="text-base text-slate-400 font-medium">%</span></p>
+        <p class="text-[11px] text-slate-500 mt-1.5">112 年 · 點擊看排名 →</p>
+      </button>
+
+      <button type="button" class="kpi text-left kpi-jump" data-jump="trend" style="--accent:#7c4dff;--accent-soft:rgba(124,77,255,.12)" aria-label="跳至歷年趨勢">
+        <div class="kpi-spark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <p class="eyebrow text-violet-600 mb-2">十年成長</p>
+        <p class="num text-3xl font-bold text-slate-900 leading-none">+3.7<span class="text-base text-slate-400 font-medium"> pp</span></p>
+        <p class="text-[11px] text-slate-500 mt-1.5">102 → 112 · 點擊看趨勢 →</p>
+      </button>
+
+      <button type="button" class="kpi text-left kpi-jump" data-jump="sports" style="--accent:#2eb872;--accent-soft:rgba(46,184,114,.12)" aria-label="跳至熱門運動">
+        <div class="kpi-spark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v6"/><circle cx="18" cy="18" r="3"/></svg>
+        </div>
+        <p class="eyebrow text-emerald-600 mb-2">熱門運動 No.1</p>
+        <p class="text-2xl font-bold text-slate-900 leading-none">健走</p>
+        <p class="text-[11px] text-slate-500 mt-1.5"><span class="num">57.1</span>% · 點擊看排行 →</p>
+      </button>
+
+      <button type="button" class="kpi text-left kpi-jump" data-jump="levels" style="--accent:#1877f2;--accent-soft:rgba(24,119,242,.12)" aria-label="跳至強度漏斗">
+        <div class="kpi-spark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+        </div>
+        <p class="eyebrow text-blue-600 mb-2">資料維度</p>
+        <p class="num text-3xl font-bold text-slate-900 leading-none">22 × 11</p>
+        <p class="text-[11px] text-slate-500 mt-1.5">縣市 × 年度 · 點擊看漏斗 →</p>
+      </button>
+    </section>
+
+    <!-- Tabs -->
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div class="tabs-wrap" role="tablist">
+        <button class="tab-btn active" data-tab="ranking" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          縣市排名
+        </button>
+        <button class="tab-btn" data-tab="trend" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          歷年趨勢
+        </button>
+        <button class="tab-btn" data-tab="sports" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          熱門運動
+        </button>
+        <button class="tab-btn" data-tab="levels" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+          強度漏斗
+        </button>
+      </div>
+      <p class="text-xs text-slate-500 hidden sm:block">點擊切換分頁 · 所有圖表支援滑鼠 hover 顯示細節</p>
+    </div>
+
+    <!-- ============ Tab: Ranking ============ -->
+    <section id="tab-ranking" class="tab-panel panel p-6 md:p-8">
+      <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-5 gap-4">
+        <div>
+          <p class="eyebrow text-orange-600 mb-1.5">22 COUNTIES · YEAR 112</p>
+          <h2 class="section-title text-2xl">運動人口比例排名</h2>
+          <p class="text-sm text-slate-500 mt-1">點選右側按鈕切換不同運動強度定義；橘紅 = 高於全國，紫 = 低於全國 · <span class="text-orange-600 font-semibold">點長條看縣市詳情</span></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="seg" role="tablist" aria-label="運動強度">
+            <button class="level-btn" data-level="7100">7100</button>
+            <button class="level-btn" data-level="7230">7230</button>
+            <button class="level-btn" data-level="7330">7330</button>
+            <button class="level-btn active" data-level="7333">7333</button>
+          </div>
+          <button id="play-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer" aria-label="自動播放">
+            <svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="play-label">播放</span>
+          </button>
+        </div>
+      </div>
+      <!-- Quick group filter chips -->
+      <div class="flex flex-wrap items-center gap-1.5 mb-4 pb-4 border-b border-slate-100">
+        <span class="eyebrow text-slate-500 mr-2">快選</span>
+        <button class="group-chip active" data-group="all">全部 22</button>
+        <button class="group-chip" data-group="metro">六都</button>
+        <button class="group-chip" data-group="east">東部離島</button>
+        <button class="group-chip" data-group="top5">前 5 名</button>
+        <button class="group-chip" data-group="bottom5">後 5 名</button>
+      </div>
+      <div id="chart-ranking" class="chart"></div>
+      <details class="mt-4 group">
+        <summary class="cursor-pointer text-xs text-slate-600 font-semibold inline-flex items-center gap-1.5 hover:text-orange-600 transition-colors">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-90 transition-transform"><polyline points="9 18 15 12 9 6"/></svg>
+          運動強度定義說明
+        </summary>
+        <div class="mt-2 text-xs text-slate-600 bg-slate-50 rounded-lg p-3 leading-relaxed space-y-1">
+          <p><span class="num font-bold text-slate-800">7100</span>　有運動（任何頻率）</p>
+          <p><span class="num font-bold text-slate-800">7230</span>　每週運動 ≥ 3 次</p>
+          <p><span class="num font-bold text-slate-800">7330</span>　每週 ≥ 3 次且每次 ≥ 30 分鐘</p>
+          <p><span class="num font-bold text-orange-600">7333</span>　規律運動（再加心跳達 130 bpm 或會喘）</p>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ Tab: Trend ============ -->
+    <section id="tab-trend" class="tab-panel panel p-6 md:p-8 hidden">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-5 gap-3">
+        <div>
+          <p class="eyebrow text-violet-600 mb-1.5">TIME SERIES · 102–112</p>
+          <h2 class="section-title text-2xl">規律運動比例歷年趨勢</h2>
+          <p class="text-sm text-slate-500 mt-1">勾選縣市進行比較（最多 8 個）·「整體」為全國平均</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="county-search" type="text" placeholder="搜尋縣市…" class="pl-8 pr-3 py-1.5 rounded-lg border-2 border-violet-200 text-sm bg-white focus:outline-none focus:border-violet-500 transition-colors w-36" aria-label="搜尋縣市">
+          </div>
+          <button id="clear-counties" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer" type="button">清除</button>
+        </div>
+      </div>
+      <div id="county-picker" class="flex flex-wrap gap-1.5 mb-5"></div>
+      <div id="chart-trend" class="chart"></div>
+    </section>
+
+    <!-- ============ Tab: Sports ============ -->
+    <section id="tab-sports" class="tab-panel panel p-6 md:p-8 hidden">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-5 gap-3">
+        <div>
+          <p class="eyebrow text-emerald-600 mb-1.5">SPORTS RANKING · TOP 20</p>
+          <h2 class="section-title text-2xl">民眾喜好運動項目</h2>
+          <p class="text-sm text-slate-500 mt-1">百分比為「有從事該項運動」之民眾占比（複選）</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="sports-year-select" class="eyebrow text-slate-500">年度</label>
+          <select id="sports-year-select" class="select-input pl-3 py-1.5 rounded-lg border-2 border-emerald-200 text-sm font-bold text-emerald-700 bg-white cursor-pointer hover:border-emerald-400 transition-colors num">
+            <option value="112" selected>112 年</option>
+            <option value="111">111 年</option>
+            <option value="110">110 年</option>
+            <option value="109">109 年</option>
+            <option value="108">108 年</option>
+            <option value="107">107 年</option>
+          </select>
+        </div>
+      </div>
+      <div id="chart-sports" class="chart" style="height: 700px;"></div>
+
+      <div class="mt-8 pt-6 border-t border-slate-200">
+        <div class="mb-4">
+          <p class="eyebrow text-emerald-600 mb-1.5">SPORTS TREND · 107–112</p>
+          <h3 class="section-title text-xl">Top 10 運動項目歷年趨勢</h3>
+          <p class="text-sm text-slate-500 mt-1">勾選感興趣的運動項目進行比較</p>
+        </div>
+        <div id="sports-picker" class="flex flex-wrap gap-1.5 mb-5"></div>
+        <div id="chart-sports-trend" class="chart" style="height: 460px;"></div>
+        <div class="mt-4 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-xl p-3 leading-relaxed flex items-start gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5 text-amber-600" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span><strong class="font-bold">資料口徑說明：</strong> 民國 <span class="num font-bold">108–110</span> 年因問卷設計變動數值偏低；<span class="num font-bold">111</span> 年起改為「過去 12 個月內曾從事」之口徑，故較先前年度大幅提升。建議聚焦 <span class="num font-bold">107、111、112</span> 三年作主要趨勢比較。</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ Tab: Levels ============ -->
+    <section id="tab-levels" class="tab-panel panel p-6 md:p-8 hidden">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between mb-5 gap-3">
+        <div>
+          <p class="eyebrow text-blue-600 mb-1.5">FUNNEL · NATIONAL vs COUNTY</p>
+          <h2 class="section-title text-2xl">運動強度漏斗</h2>
+          <p class="text-sm text-slate-500 mt-1">從「有運動」到「規律運動」的人口流失情形</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="county-select" class="eyebrow text-slate-500">縣市</label>
+          <select id="county-select" class="select-input pl-3 py-1.5 rounded-lg border-2 border-blue-200 text-sm font-bold text-blue-700 bg-white cursor-pointer hover:border-blue-400 transition-colors">
+            <option value="花蓮縣">花蓮縣 (No.1)</option>
+            <option value="臺北市">臺北市</option>
+            <option value="新北市">新北市</option>
+            <option value="桃園市">桃園市</option>
+            <option value="臺中市">臺中市</option>
+            <option value="臺南市">臺南市</option>
+            <option value="高雄市">高雄市</option>
+            <option value="雲林縣" selected>雲林縣 (No.22)</option>
+          </select>
+        </div>
+      </div>
+      <div id="chart-levels" class="chart"></div>
+    </section>
+
+    <!-- Keyboard shortcuts help -->
+    <div class="mt-8 panel p-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-600">
+      <span class="eyebrow text-slate-500">鍵盤快捷鍵</span>
+      <span class="flex items-center gap-1.5"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> 切換分頁</span>
+      <span class="flex items-center gap-1.5"><kbd>←</kbd><kbd>→</kbd> 切換運動強度</span>
+      <span class="flex items-center gap-1.5"><kbd>Space</kbd> 播放/暫停</span>
+      <span class="flex items-center gap-1.5"><kbd>Esc</kbd> 關閉詳情</span>
+    </div>
+
+    <!-- Disclaimer & limitations (collapsible) -->
+    <details class="mt-8 group panel border-amber-200 overflow-hidden">
+      <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-3 hover:bg-amber-50/60 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center bg-amber-100 text-amber-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <p class="eyebrow text-amber-700">DISCLAIMER</p>
+            <p class="font-bold text-slate-900 text-sm">資料分析限制與免責說明</p>
+          </div>
+        </div>
+        <svg class="text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div class="px-5 pb-5 pt-1 border-t border-amber-100">
+        <div class="grid md:grid-cols-2 gap-x-6 gap-y-3.5 text-xs text-slate-600 leading-relaxed pt-4">
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-orange-500"></span>調查方法</p>
+            <p>資料來自運動部「運動現況調查」電話訪問，受訪者自我報告，可能存在<span class="font-semibold text-slate-800">社會期許偏誤</span>。</p>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-violet-500"></span>口徑變動</p>
+            <p><span class="num">108–110</span> 年因問卷調整數值偏低；<span class="num">111</span> 年起改口徑，<span class="font-semibold text-slate-800">跨年度比較須謹慎</span>。</p>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>抽樣誤差</p>
+            <p>各縣市樣本有限，<span class="num">95%</span> CI 下約 <span class="num">±3–5</span>pp，小差距不具統計顯著性。</p>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-blue-500"></span>資料時效</p>
+            <p>最新截至民國 <span class="num">112</span> 年（2023），<span class="font-semibold text-slate-800">非即時數據</span>。</p>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500"></span>因果推論</p>
+            <p>僅呈現相關性與差異，<span class="font-semibold text-slate-800">不代表因果</span>，不應作為政策制定唯一依據。</p>
+          </div>
+          <div>
+            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>醫療免責</p>
+            <p><span class="font-semibold text-slate-800">非醫療診斷工具</span>，運動處方／復健建議請諮詢合格醫師或物理治療師。</p>
+          </div>
+        </div>
+        <p class="mt-4 pt-3 border-t border-amber-100 text-[11px] text-slate-500">
+          <span class="font-bold text-slate-700">使用條款：</span>本儀表板僅作教育與公益用途，引用請註明來源（運動部）。
+        </p>
+      </div>
+    </details>
+
+    <!-- Footer -->
+    <footer class="mt-8 pt-6 border-t border-orange-100">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-slate-500">
+        <p>
+          資料來源：<a href="https://data.gov.tw/dataset/24375" target="_blank" rel="noopener" class="text-orange-600 hover:underline font-semibold">運動部「運動城市調查各縣市規律運動現況」</a> · 政府資料開放授權條款 v1.0
+        </p>
+        <p>取得管道：<span class="num font-semibold text-slate-700">TwinkleAI</span> Open Data MCP · 視覺化由 Claude Code 建置</p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- County detail drawer -->
+  <div id="drawer-mask" class="drawer-mask" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer" role="dialog" aria-labelledby="drawer-title" aria-hidden="true">
+    <div class="p-6">
+      <div class="flex items-start justify-between mb-5">
+        <div>
+          <p class="eyebrow text-orange-600 mb-1">COUNTY PROFILE</p>
+          <h3 id="drawer-title" class="text-2xl font-bold text-slate-900">—</h3>
+          <p id="drawer-rank" class="text-sm text-slate-500 mt-1">—</p>
+        </div>
+        <button id="drawer-close" class="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer transition-colors" aria-label="關閉">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div id="drawer-stats" class="grid grid-cols-2 gap-3 mb-6"></div>
+
+      <p class="eyebrow text-slate-500 mb-2">歷年規律運動率（102–112）</p>
+      <div id="drawer-chart" style="width:100%;height:180px;"></div>
+
+      <div class="mt-6 pt-4 border-t border-slate-100">
+        <p class="eyebrow text-slate-500 mb-2">十年變化</p>
+        <p id="drawer-change" class="text-2xl font-bold num">—</p>
+      </div>
+    </div>
+  </aside>
+
+<script>
+// ============ DATA (從運動部 dataset 24375 提取) ============
+const rankingData = {
+  '7100': [['連江縣',82.2],['臺北市',81.1],['新竹市',80.7],['高雄市',79.6],['桃園市',78.8],['臺中市',78.2],['澎湖縣',77.9],['金門縣',76.5],['新北市',76.4],['南投縣',75.7],['基隆市',75.6],['宜蘭縣',75.0],['花蓮縣',74.8],['嘉義市',74.7],['苗栗縣',74.5],['彰化縣',74.3],['新竹縣',74.2],['屏東縣',74.0],['臺東縣',72.4],['雲林縣',70.9],['臺南市',70.8],['嘉義縣',69.3]],
+  '7230': [['連江縣',66.8],['臺北市',65.6],['高雄市',63.4],['澎湖縣',63.1],['新竹市',61.8],['嘉義市',61.7],['金門縣',61.6],['宜蘭縣',61.5],['桃園市',60.2],['花蓮縣',60.2],['臺中市',59.8],['臺東縣',59.0],['基隆市',58.4],['新北市',58.3],['苗栗縣',58.2],['南投縣',57.5],['新竹縣',57.4],['屏東縣',57.3],['臺南市',56.5],['彰化縣',56.4],['雲林縣',54.5],['嘉義縣',53.3]],
+  '7330': [['連江縣',53.0],['花蓮縣',51.9],['臺北市',51.1],['金門縣',50.9],['宜蘭縣',50.8],['臺東縣',50.1],['澎湖縣',49.7],['嘉義市',49.1],['屏東縣',47.4],['南投縣',47.4],['桃園市',47.3],['高雄市',47.2],['新竹市',46.3],['新竹縣',44.5],['苗栗縣',44.2],['新北市',43.7],['嘉義縣',43.6],['雲林縣',43.3],['臺南市',43.0],['臺中市',42.8],['彰化縣',42.5],['基隆市',42.0]],
+  '7333': [['花蓮縣',40.8],['宜蘭縣',39.8],['連江縣',39.4],['臺北市',39.2],['澎湖縣',38.8],['嘉義市',38.8],['金門縣',38.6],['臺東縣',38.5],['屏東縣',37.1],['高雄市',37.0],['新竹市',36.1],['南投縣',35.5],['桃園市',35.4],['嘉義縣',35.1],['新竹縣',34.2],['臺南市',34.0],['基隆市',34.0],['新北市',32.7],['臺中市',32.6],['苗栗縣',32.4],['彰化縣',32.1],['雲林縣',31.9]]
+};
+const overallByLevel = { '7100': 76.6, '7230': 59.7, '7330': 45.7, '7333': 35.0 };
+const counties = ['花蓮縣','宜蘭縣','連江縣','臺北市','澎湖縣','嘉義市','金門縣','臺東縣','屏東縣','高雄市','新竹市','南投縣','桃園市','嘉義縣','新竹縣','臺南市','基隆市','新北市','臺中市','苗栗縣','彰化縣','雲林縣'];
+const years = ['102','103','104','105','106','107','108','109','110','111','112'];
+const trendData = {
+  '南投縣':[19.19,26.05,27.9,33.91,33.5,33.3,34.4,33.9,34.8,35.1,35.5],
+  '嘉義市':[21.42,29.93,25.94,35.27,38.1,37.1,37.9,39.7,37.7,38.2,38.8],
+  '嘉義縣':[22.14,25.12,24.34,30.75,29.0,31.4,30.2,32.6,33.5,33.7,35.1],
+  '基隆市':[24.49,24.55,23.11,31.92,32.8,33.0,33.8,33.1,33.6,33.1,34.0],
+  '宜蘭縣':[23.56,25.72,25.57,33.72,32.6,33.9,36.1,39.4,37.5,37.6,39.8],
+  '屏東縣':[25.82,23.65,27.17,33.44,30.8,34.5,35.6,34.1,34.9,35.2,37.1],
+  '彰化縣':[27.53,25.68,28.6,33.16,32.9,38.4,34.2,31.5,30.4,30.5,32.1],
+  '整體':[31.3,33.0,33.4,33.0,33.2,33.5,33.6,33.0,33.9,34.0,35.0],
+  '新北市':[25.56,24.29,23.53,30.61,35.0,32.5,32.2,30.1,31.7,31.8,32.7],
+  '新竹市':[22.57,24.27,26.92,31.59,33.6,33.7,35.0,34.6,35.6,35.3,36.1],
+  '新竹縣':[23.02,21.69,23.56,29.4,31.7,30.8,32.5,31.9,33.8,33.8,34.2],
+  '桃園市':[23.85,26.12,26.97,31.72,30.6,29.4,32.6,32.4,34.3,34.5,35.4],
+  '澎湖縣':[29.35,28.7,29.65,35.53,35.7,32.2,33.2,36.8,36.5,36.6,38.8],
+  '臺中市':[24.68,27.96,30.83,34.34,34.2,33.1,31.4,33.5,32.3,32.5,32.6],
+  '臺北市':[24.56,28.71,25.5,35.82,34.6,37.2,38.0,37.0,37.7,37.4,39.2],
+  '臺南市':[24.47,25.7,26.39,32.36,32.9,32.0,30.3,30.4,32.3,32.7,34.0],
+  '臺東縣':[26.62,30.52,26.9,36.21,35.3,36.5,36.3,33.6,37.5,38.1,38.5],
+  '花蓮縣':[28.91,28.68,30.47,35.8,34.4,40.5,39.4,36.3,40.3,40.1,40.8],
+  '苗栗縣':[26.14,22.74,26.6,33.18,31.9,32.8,33.0,33.1,32.4,31.8,32.4],
+  '連江縣':[29.82,26.82,25.65,36.86,32.5,41.0,40.9,37.8,36.6,37.7,39.4],
+  '金門縣':[27.79,23.89,33.27,32.04,34.0,31.3,31.9,33.6,36.5,36.9,38.6],
+  '雲林縣':[28.45,24.09,31.7,32.12,29.0,29.3,29.7,30.0,30.1,30.4,31.9],
+  '高雄市':[24.67,28.1,27.36,34.33,33.1,34.5,35.3,34.1,35.9,36.3,37.0]
+};
+const sportsByYear = {
+  '112': [['散步/走路/健走',57.07],['慢跑',18.67],['爬山',12.27],['騎自行車',10.73],['在家健身訓練',10.7],['伸展操/瑜珈',9.4],['羽球',9.1],['籃球',8.63],['上民間健身房',5.23],['游泳',4.7],['有氧舞蹈',2.87],['武術類',2.6],['桌球',2.5],['排球',1.9],['上國民運動中心',1.77],['公園/社區運動器材',1.6],['棒球',1.3],['民俗/土風舞',0.83],['網球',0.73],['高爾夫',0.6]],
+  '111': [['散步/走路/健走',61.93],['爬山',17.83],['慢跑',16.9],['騎自行車',14.37],['在家健身訓練',12.8],['羽球',11.4],['籃球',9.47],['伸展操/瑜珈',6.6],['上民間健身房',6.1],['游泳',5.1],['桌球',3.2],['公園/社區運動器材',2.7],['武術類',2.6],['上國民運動中心',2.43],['有氧舞蹈',2.23],['排球',2.07],['棒球',1.9],['網球',0.93],['高爾夫',0.9],['民俗/土風舞',0.87]],
+  '110': [['散步/走路/健走',34.57],['慢跑',11.83],['爬山',5.7],['羽球',5.5],['游泳',3.63],['騎自行車',3.27],['伸展操/瑜珈',3.13],['籃球',3.03],['桌球',1.1],['有氧舞蹈',0.47],['排球',0.43],['棒球',0.3],['網球',0.1]],
+  '109': [['散步/走路/健走',33.37],['慢跑',14.73],['爬山',5.23],['游泳',4.9],['籃球',3.73],['騎自行車',3.47],['伸展操/瑜珈',3.2],['羽球',3.1],['桌球',0.83],['有氧舞蹈',0.8],['網球',0.2],['棒球',0.2],['排球',0.2]],
+  '108': [['散步/走路/健走',32.1],['慢跑',14.0],['游泳',6.87],['爬山',4.83],['籃球',3.87],['騎自行車',3.83],['伸展操/瑜珈',3.23],['羽球',2.9],['有氧舞蹈',0.9],['桌球',0.6],['棒球',0.4],['排球',0.2],['網球',0.07]],
+  '107': [['散步/走路/健走',54.0],['慢跑',23.07],['爬山',12.1],['騎自行車',10.37],['籃球',10.1],['伸展操/瑜珈',8.73],['游泳',7.2],['羽球',4.7],['有氧舞蹈',2.57],['桌球',1.47],['排球',1.27],['棒球',0.9],['網球',0.77]]
+};
+
+const topSports10 = sportsByYear['112'].slice(0, 10).map(d => d[0]);
+const sportsYears = ['107','108','109','110','111','112'];
+const sportsTrendData = {};
+topSports10.forEach(sport => {
+  sportsTrendData[sport] = sportsYears.map(y => {
+    const row = (sportsByYear[y] || []).find(r => r[0] === sport);
+    return row ? row[1] : null;
+  });
+});
+
+// ============ Chart instances ============
+const charts = {};
+
+// Shared echarts theme tokens
+const AX = {
+  color: '#94a3b8',
+  fontFamily: 'Fira Sans, "Noto Sans TC", sans-serif',
+  fontSize: 11.5
+};
+const SPLIT_LINE = { lineStyle: { color: '#f1f5f9', type: 'dashed' } };
+const TOOLTIP_BASE = {
+  backgroundColor: 'rgba(15,23,42,.92)',
+  borderColor: 'transparent',
+  textStyle: { color: '#fff', fontFamily: 'Fira Sans, "Noto Sans TC", sans-serif', fontSize: 12 },
+  extraCssText: 'box-shadow:0 8px 24px rgba(0,0,0,.18);border-radius:8px;padding:8px 12px;'
+};
+
+// County grouping for quick filter
+const GROUPS = {
+  all: counties,
+  metro: ['臺北市','新北市','桃園市','臺中市','臺南市','高雄市'],
+  east: ['花蓮縣','宜蘭縣','臺東縣','澎湖縣','金門縣','連江縣'],
+  top5: null,    // dynamic, computed by level
+  bottom5: null
+};
+let currentGroup = 'all';
+let currentLevel = '7333';
+
+function getFilteredRanking(level, group) {
+  const raw = rankingData[level];
+  if (group === 'all') return raw;
+  if (group === 'top5') return raw.slice(0, 5);
+  if (group === 'bottom5') return raw.slice(-5);
+  const allowed = GROUPS[group] || counties;
+  return raw.filter(r => allowed.includes(r[0]));
+}
+
+// ============ Chart 1: Ranking ============
+function renderRanking(level=currentLevel, group=currentGroup) {
+  currentLevel = level; currentGroup = group;
+  const data = getFilteredRanking(level, group).slice().reverse();
+  const overall = overallByLevel[level];
+  const opt = {
+    grid: { left: 80, right: 90, top: 20, bottom: 20 },
+    tooltip: {
+      ...TOOLTIP_BASE,
+      trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(255,107,53,.08)' } },
+      formatter: p => `<b>${p[0].name}</b><br/><span style="font-family:Fira Code,monospace;font-weight:600">${p[0].value}%</span>`
+    },
+    xAxis: {
+      type: 'value',
+      axisLabel: { ...AX, formatter: '{value}%' },
+      splitLine: SPLIT_LINE,
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'category',
+      data: data.map(d => d[0]),
+      axisLabel: { color: '#334155', fontWeight: 600, fontSize: 12, fontFamily: AX.fontFamily },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => ({
+        value: d[1],
+        itemStyle: {
+          color: d[1] >= overall
+            ? new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#ff6b35' },{ offset:1, color:'#f43f5e' }])
+            : new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#c4b5fd' },{ offset:1, color:'#a78bfa' }]),
+          borderRadius: [0,8,8,0]
+        }
+      })),
+      label: { show: true, position: 'right', formatter: '{c}%', color: '#334155', fontWeight: 600, fontFamily: 'Fira Code, monospace', fontSize: 11.5 },
+      markLine: {
+        symbol: 'none',
+        lineStyle: { color: '#1877f2', type: 'dashed', width: 1.5 },
+        label: { formatter: `全國 ${overall}%`, color: '#fff', fontWeight: 700, backgroundColor: '#1877f2', padding: [4,8], borderRadius: 4, fontFamily: AX.fontFamily, fontSize: 11 },
+        data: [{ xAxis: overall }]
+      },
+      barWidth: '60%',
+      animationDelay: i => i * 25
+    }]
+  };
+  if (!charts.ranking) {
+    charts.ranking = echarts.init(document.getElementById('chart-ranking'));
+    charts.ranking.on('click', params => {
+      if (params.componentType === 'series') openDrawer(params.name);
+    });
+    charts.ranking.getZr().on('mousemove', () => { document.getElementById('chart-ranking').style.cursor = 'pointer'; });
+  }
+  charts.ranking.setOption(opt, true);
+}
+
+// ============ Chart 2: Trend ============
+let selectedCounties = ['整體','臺北市','花蓮縣','臺中市','雲林縣'];
+const palette = ['#0f172a','#ff6b35','#7c4dff','#2eb872','#1877f2','#f43f5e','#f59e0b','#06b6d4'];
+
+function renderCountyPicker() {
+  const picker = document.getElementById('county-picker');
+  picker.innerHTML = '';
+  ['整體', ...counties].forEach((c, i) => {
+    const checked = selectedCounties.includes(c);
+    const idx = ['整體', ...counties].indexOf(c);
+    const color = palette[selectedCounties.indexOf(c) % palette.length];
+    const el = document.createElement('label');
+    el.className = `checkbox-pill px-3 py-1.5 rounded-full text-xs font-semibold border bg-white`;
+    el.style.cssText = checked
+      ? `background-color:${color};border-color:${color};color:#fff;box-shadow:0 2px 8px ${color}55`
+      : 'border-color:#e2e8f0;color:#475569';
+    el.innerHTML = `<input type="checkbox" data-county="${c}" ${checked?'checked':''}><span>${c}</span>`;
+    picker.appendChild(el);
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      const idx = selectedCounties.indexOf(c);
+      if (idx >= 0) selectedCounties.splice(idx,1);
+      else if (selectedCounties.length < 8) selectedCounties.push(c);
+      else return;
+      renderCountyPicker();
+      renderTrend();
+    });
+  });
+}
+
+function renderTrend() {
+  const opt = {
+    grid: { left: 50, right: 30, top: 40, bottom: 40 },
+    tooltip: { ...TOOLTIP_BASE, trigger: 'axis' },
+    legend: { top: 0, type: 'scroll', textStyle: { color: '#475569', fontFamily: AX.fontFamily, fontSize: 12 } },
+    xAxis: {
+      type: 'category',
+      data: years.map(y => `${y}年`),
+      axisLabel: AX, axisLine: { lineStyle: { color: '#e2e8f0' } }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value', min: 18, max: 45,
+      axisLabel: { ...AX, formatter: '{value}%' }, splitLine: SPLIT_LINE,
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: selectedCounties.map((c, i) => ({
+      name: c, type: 'line',
+      data: trendData[c] || [],
+      smooth: true, symbol: 'circle', symbolSize: 7,
+      lineStyle: { width: c === '整體' ? 4 : 2.5, color: palette[i % palette.length] },
+      itemStyle: { color: palette[i % palette.length] },
+      emphasis: { focus: 'series', lineStyle: { width: 4 } }
+    }))
+  };
+  if (!charts.trend) charts.trend = echarts.init(document.getElementById('chart-trend'));
+  charts.trend.setOption(opt, true);
+}
+
+// ============ Chart 3: Sports (Year-switchable) ============
+function renderSports(year='112') {
+  const raw = sportsByYear[year] || [];
+  const data = raw.slice(0, 20).slice().reverse();
+  const opt = {
+    grid: { left: 130, right: 80, top: 10, bottom: 20 },
+    tooltip: {
+      ...TOOLTIP_BASE, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(46,184,114,.08)' } },
+      formatter: p => `<b>${p[0].name}</b><br/><span style="font-family:Fira Code,monospace;font-weight:600">${p[0].value}%</span>`
+    },
+    xAxis: {
+      type: 'value', axisLabel: { ...AX, formatter: '{value}%' },
+      splitLine: SPLIT_LINE, axisLine: { show: false }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'category', data: data.map(d => d[0]),
+      axisLabel: { color: '#334155', fontWeight: 500, fontSize: 12, fontFamily: AX.fontFamily },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map((d, i) => {
+        const tier = i >= 15 ? 0 : i >= 10 ? 1 : i >= 5 ? 2 : 3;
+        const colors = [
+          ['#ff6b35','#f43f5e'],
+          ['#a855f7','#7c4dff'],
+          ['#3b82f6','#1877f2'],
+          ['#34d399','#2eb872']
+        ];
+        return {
+          value: d[1],
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0,0,1,0,[
+              { offset:0, color:colors[tier][0] }, { offset:1, color:colors[tier][1] }
+            ]),
+            borderRadius: [0,8,8,0]
+          }
+        };
+      }),
+      label: { show: true, position: 'right', formatter: '{c}%', color: '#334155', fontWeight: 600, fontFamily: 'Fira Code, monospace', fontSize: 11.5 },
+      barWidth: '65%',
+      animationDelay: i => i * 20
+    }]
+  };
+  if (!charts.sports) charts.sports = echarts.init(document.getElementById('chart-sports'));
+  charts.sports.setOption(opt, true);
+}
+
+// ============ Chart 3b: Sports Trend ============
+let selectedSports = ['散步/走路/健走','慢跑','爬山','騎自行車','在家健身訓練','籃球'];
+const sportsPalette = ['#ff6b35','#7c4dff','#2eb872','#1877f2','#f43f5e','#06b6d4','#f59e0b','#a855f7','#10b981','#0ea5e9'];
+
+function renderSportsPicker() {
+  const picker = document.getElementById('sports-picker');
+  picker.innerHTML = '';
+  topSports10.forEach((sport, i) => {
+    const checked = selectedSports.includes(sport);
+    const color = sportsPalette[i];
+    const el = document.createElement('label');
+    el.className = `checkbox-pill px-3 py-1.5 rounded-full text-xs font-semibold border bg-white`;
+    el.style.cssText = checked
+      ? `background-color:${color};border-color:${color};color:#fff;box-shadow:0 2px 8px ${color}55`
+      : 'border-color:#e2e8f0;color:#475569';
+    el.innerHTML = `<input type="checkbox" data-sport="${sport}" ${checked?'checked':''}><span>${sport}</span>`;
+    picker.appendChild(el);
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      const idx = selectedSports.indexOf(sport);
+      if (idx >= 0) selectedSports.splice(idx,1);
+      else if (selectedSports.length < 8) selectedSports.push(sport);
+      else return;
+      renderSportsPicker();
+      renderSportsTrend();
+    });
+  });
+}
+
+function renderSportsTrend() {
+  const opt = {
+    grid: { left: 50, right: 30, top: 40, bottom: 40 },
+    tooltip: {
+      ...TOOLTIP_BASE, trigger: 'axis',
+      formatter: params => {
+        const yr = params[0].axisValue;
+        const rows = params
+          .filter(p => p.value !== null && p.value !== undefined)
+          .sort((a,b) => b.value - a.value)
+          .map(p => `${p.marker} ${p.seriesName}：<span style="font-family:Fira Code,monospace;font-weight:600">${p.value}%</span>`)
+          .join('<br/>');
+        return `<b>${yr}</b><br/>${rows}`;
+      }
+    },
+    legend: { top: 0, type: 'scroll', textStyle: { color: '#475569', fontFamily: AX.fontFamily, fontSize: 12 } },
+    xAxis: {
+      type: 'category', data: sportsYears.map(y => `${y}年`),
+      axisLabel: AX, axisLine: { lineStyle: { color: '#e2e8f0' } }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value', axisLabel: { ...AX, formatter: '{value}%' },
+      splitLine: SPLIT_LINE, axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: selectedSports.map(sport => {
+      const idx = topSports10.indexOf(sport);
+      const color = sportsPalette[idx % sportsPalette.length];
+      return {
+        name: sport, type: 'line',
+        data: sportsTrendData[sport] || [],
+        smooth: true, connectNulls: true,
+        symbol: 'circle', symbolSize: 8,
+        lineStyle: { width: 2.8, color },
+        itemStyle: { color },
+        emphasis: { focus: 'series', lineStyle: { width: 4 } }
+      };
+    })
+  };
+  if (!charts.sportsTrend) charts.sportsTrend = echarts.init(document.getElementById('chart-sports-trend'));
+  charts.sportsTrend.setOption(opt, true);
+}
+
+// ============ Chart 4: Levels (Funnel) ============
+function renderLevels(county='雲林縣') {
+  const overall = [overallByLevel['7100'], overallByLevel['7230'], overallByLevel['7330'], overallByLevel['7333']];
+  const getCountyVal = (level) => {
+    const row = rankingData[level].find(r => r[0] === county);
+    return row ? row[1] : null;
+  };
+  const countyVals = ['7100','7230','7330','7333'].map(getCountyVal);
+  const labels = ['7100 有運動','7230 每週≥3次','7330 ≥3次30分','7333 規律運動'];
+
+  const opt = {
+    grid: { left: 140, right: 60, top: 40, bottom: 30 },
+    tooltip: {
+      ...TOOLTIP_BASE, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(24,119,242,.08)' } },
+      formatter: p => p.map(x => `${x.marker} ${x.seriesName}：<span style="font-family:Fira Code,monospace;font-weight:600">${x.value}%</span>`).join('<br/>')
+    },
+    legend: { top: 0, textStyle: { color: '#475569', fontFamily: AX.fontFamily, fontSize: 12 } },
+    xAxis: {
+      type: 'value', max: 90,
+      axisLabel: { ...AX, formatter: '{value}%' },
+      splitLine: SPLIT_LINE, axisLine: { show: false }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'category', data: labels,
+      axisLabel: { color: '#334155', fontWeight: 600, fontSize: 12.5, fontFamily: AX.fontFamily },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [
+      {
+        name: '全國', type: 'bar', data: overall,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#60a5fa' },{ offset:1, color:'#1877f2' }]),
+          borderRadius: [0,6,6,0]
+        },
+        label: { show: true, position: 'right', formatter: '{c}%', color: '#1877f2', fontWeight: 700, fontFamily: 'Fira Code, monospace', fontSize: 11.5 },
+        barWidth: '32%'
+      },
+      {
+        name: county, type: 'bar', data: countyVals,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#ff6b35' },{ offset:1, color:'#f43f5e' }]),
+          borderRadius: [0,6,6,0]
+        },
+        label: { show: true, position: 'right', formatter: '{c}%', color: '#f43f5e', fontWeight: 700, fontFamily: 'Fira Code, monospace', fontSize: 11.5 },
+        barWidth: '32%'
+      }
+    ]
+  };
+  if (!charts.levels) charts.levels = echarts.init(document.getElementById('chart-levels'));
+  charts.levels.setOption(opt, true);
+}
+
+// ============ Interactions ============
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById(`tab-${tab}`).classList.remove('hidden');
+    setTimeout(() => {
+      if (tab === 'ranking' && charts.ranking) charts.ranking.resize();
+      if (tab === 'trend' && charts.trend) charts.trend.resize();
+      if (tab === 'sports') {
+        if (charts.sports) charts.sports.resize();
+        if (charts.sportsTrend) charts.sportsTrend.resize();
+      }
+      if (tab === 'levels' && charts.levels) charts.levels.resize();
+    }, 50);
+  });
+});
+
+document.querySelectorAll('.level-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderRanking(btn.dataset.level);
+  });
+});
+
+document.getElementById('county-select').addEventListener('change', e => renderLevels(e.target.value));
+document.getElementById('sports-year-select').addEventListener('change', e => renderSports(e.target.value));
+
+// ============ Interaction A: KPI cards jump to tab ============
+document.querySelectorAll('.kpi-jump').forEach(btn => {
+  btn.style.cursor = 'pointer';
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.jump;
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (tabBtn) {
+      tabBtn.click();
+      document.querySelector(`#tab-${tab}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// ============ Interaction B: Group filter chips ============
+document.querySelectorAll('.group-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.group-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    renderRanking(currentLevel, chip.dataset.group);
+  });
+});
+
+// ============ Interaction C: Auto-play level animation ============
+let playTimer = null;
+const levels = ['7100','7230','7330','7333'];
+function setLevel(l) {
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', b.dataset.level === l));
+  renderRanking(l, currentGroup);
+}
+function togglePlay() {
+  const playBtn = document.getElementById('play-btn');
+  const playIcon = document.getElementById('play-icon');
+  const playLabel = document.getElementById('play-label');
+  if (playTimer) {
+    clearInterval(playTimer); playTimer = null;
+    playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    playLabel.textContent = '播放';
+  } else {
+    let i = levels.indexOf(currentLevel);
+    playTimer = setInterval(() => {
+      i = (i + 1) % levels.length;
+      setLevel(levels[i]);
+    }, 1600);
+    playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    playLabel.textContent = '暫停';
+  }
+}
+document.getElementById('play-btn').addEventListener('click', togglePlay);
+
+// ============ Interaction D: County search + clear ============
+document.getElementById('county-search').addEventListener('input', e => {
+  const q = e.target.value.trim();
+  document.querySelectorAll('#county-picker .checkbox-pill').forEach(pill => {
+    const text = pill.querySelector('span').textContent;
+    pill.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+});
+document.getElementById('clear-counties').addEventListener('click', () => {
+  selectedCounties = ['整體'];
+  renderCountyPicker();
+  renderTrend();
+});
+
+// ============ Interaction E: Drawer (county detail) ============
+const drawer = document.getElementById('drawer');
+const drawerMask = document.getElementById('drawer-mask');
+
+function openDrawer(county) {
+  if (!trendData[county]) return;
+  const series = trendData[county];
+  const overall112 = overallByLevel['7333'];
+  const cur = series[series.length - 1];
+  const base = series[0];
+  const change = (cur - base).toFixed(1);
+  const rank7333 = rankingData['7333'].findIndex(r => r[0] === county) + 1;
+
+  document.getElementById('drawer-title').textContent = county;
+  document.getElementById('drawer-rank').textContent =
+    rank7333 ? `7333 規律運動率 全國第 ${rank7333} 名 / 22` : '—';
+
+  // KPI grid: 4 levels
+  const stats = ['7100','7230','7330','7333'].map(lv => {
+    const row = rankingData[lv].find(r => r[0] === county);
+    return { lv, val: row ? row[1] : null, overall: overallByLevel[lv] };
+  });
+  document.getElementById('drawer-stats').innerHTML = stats.map(s => {
+    const diff = (s.val - s.overall).toFixed(1);
+    const positive = s.val >= s.overall;
+    return `
+      <div class="rounded-xl bg-slate-50 p-3 border border-slate-200">
+        <p class="eyebrow text-slate-500 mb-1">${s.lv}</p>
+        <p class="num text-xl font-bold text-slate-900">${s.val}<span class="text-sm text-slate-400">%</span></p>
+        <p class="text-[11px] mt-0.5 ${positive ? 'text-emerald-600' : 'text-rose-500'} font-semibold">
+          ${positive ? '+' : ''}${diff} vs 全國
+        </p>
+      </div>`;
+  }).join('');
+
+  const colorChange = change >= 0 ? '#2eb872' : '#f43f5e';
+  const drawerChange = document.getElementById('drawer-change');
+  drawerChange.textContent = `${change >= 0 ? '+' : ''}${change} pp`;
+  drawerChange.style.color = colorChange;
+
+  // Mini trend chart
+  if (!charts.drawer) charts.drawer = echarts.init(document.getElementById('drawer-chart'));
+  charts.drawer.setOption({
+    grid: { left: 35, right: 10, top: 15, bottom: 25 },
+    tooltip: { ...TOOLTIP_BASE, trigger: 'axis' },
+    xAxis: {
+      type: 'category', data: years.map(y => `${y}`),
+      axisLabel: { ...AX, fontSize: 10 }, axisLine: { lineStyle: { color: '#e2e8f0' } }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value', axisLabel: { ...AX, fontSize: 10, formatter: '{value}%' },
+      splitLine: SPLIT_LINE, axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'line', data: series,
+      smooth: true, symbol: 'circle', symbolSize: 6,
+      lineStyle: { width: 3, color: '#ff6b35' },
+      itemStyle: { color: '#ff6b35' },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0,0,0,1,[
+          { offset:0, color:'rgba(255,107,53,.3)' }, { offset:1, color:'rgba(255,107,53,0)' }
+        ])
+      }
+    }]
+  }, true);
+  setTimeout(() => charts.drawer.resize(), 100);
+
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+  drawerMask.classList.add('open');
+}
+function closeDrawer() {
+  drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+  drawerMask.classList.remove('open');
+}
+document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+drawerMask.addEventListener('click', closeDrawer);
+
+// ============ Interaction F: Keyboard shortcuts ============
+document.addEventListener('keydown', e => {
+  // Ignore when typing in input
+  if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  const tabs = ['ranking','trend','sports','levels'];
+  if (['1','2','3','4'].includes(e.key)) {
+    const tab = tabs[parseInt(e.key) - 1];
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).click();
+  } else if (e.key === 'Escape') {
+    closeDrawer();
+  } else if (e.key === ' ' && document.getElementById('tab-ranking') && !document.getElementById('tab-ranking').classList.contains('hidden')) {
+    e.preventDefault();
+    togglePlay();
+  } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !document.getElementById('tab-ranking').classList.contains('hidden')) {
+    const idx = levels.indexOf(currentLevel);
+    const next = e.key === 'ArrowLeft' ? (idx - 1 + levels.length) % levels.length : (idx + 1) % levels.length;
+    setLevel(levels[next]);
+  }
+});
+
+// Init
+renderRanking('7333','all');
+renderCountyPicker();
+renderTrend();
+renderSports('112');
+renderSportsPicker();
+renderSportsTrend();
+renderLevels('雲林縣');
+
+window.addEventListener('resize', () => Object.values(charts).forEach(c => c && c.resize()));
+</script>
+</body>
+</html>
