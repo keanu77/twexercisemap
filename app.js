@@ -301,6 +301,7 @@ topSports10.forEach((sport) => {
 
 // ============ Chart instances ============
 const charts = {};
+let mapGeoJSON = null;
 
 // Shared echarts theme tokens
 const AX = {
@@ -1309,12 +1310,12 @@ async function renderMap() {
   const loading = document.getElementById("map-loading");
   if (!el) return;
   try {
-    if (!charts._mapData) {
+    if (!mapGeoJSON) {
       const res = await fetch("./data/taiwan-counties.geo.json");
       if (!res.ok) throw new Error("Map fetch failed " + res.status);
-      charts._mapData = await res.json();
+      mapGeoJSON = await res.json();
       // ECharts 5.x 需要 { geoJSON: data } 而非直接傳 GeoJSON
-      echarts.registerMap("taiwan", { geoJSON: charts._mapData });
+      echarts.registerMap("taiwan", { geoJSON: mapGeoJSON });
     }
     if (loading) loading.style.display = "none";
 
@@ -1447,5 +1448,7 @@ renderSportsTrend();
 renderLevels("臺中市");
 
 window.addEventListener("resize", () =>
-  Object.values(charts).forEach((c) => c && c.resize()),
+  Object.values(charts).forEach(
+    (c) => c && typeof c.resize === "function" && c.resize(),
+  ),
 );

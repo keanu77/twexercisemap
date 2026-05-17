@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /dist/
 
 # AI search / answer engine crawlers — explicitly allowed
 User-agent: GPTBot
