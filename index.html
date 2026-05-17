@@ -280,10 +280,10 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <div class="seg" role="tablist" aria-label="運動強度">
-            <button class="level-btn" data-level="7100">7100</button>
-            <button class="level-btn" data-level="7230">7230</button>
-            <button class="level-btn" data-level="7330">7330</button>
-            <button class="level-btn active" data-level="7333">7333</button>
+            <button class="level-btn" data-level="7100" title="任何頻率有運動">有運動</button>
+            <button class="level-btn" data-level="7230" title="每週運動 3 次以上">每週3+次</button>
+            <button class="level-btn" data-level="7330" title="每週 3 次以上，每次 30 分鐘">加30分鐘</button>
+            <button class="level-btn active" data-level="7333" title="規律運動：再加心率 130 bpm 或會喘">規律運動</button>
           </div>
           <button id="play-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer" aria-label="自動播放">
             <svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -301,18 +301,35 @@
         <button class="group-chip" data-group="bottom5">後 5 名</button>
       </div>
       <div id="chart-ranking" class="chart"></div>
-      <details class="mt-4 group">
-        <summary class="cursor-pointer text-xs text-slate-600 font-semibold inline-flex items-center gap-1.5 hover:text-orange-600 transition-colors">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-open:rotate-90 transition-transform"><polyline points="9 18 15 12 9 6"/></svg>
-          運動強度定義說明
-        </summary>
-        <div class="mt-2 text-xs text-slate-600 bg-slate-50 rounded-lg p-3 leading-relaxed space-y-1">
-          <p><span class="num font-bold text-slate-800">7100</span>　有運動（任何頻率）</p>
-          <p><span class="num font-bold text-slate-800">7230</span>　每週運動 ≥ 3 次</p>
-          <p><span class="num font-bold text-slate-800">7330</span>　每週 ≥ 3 次且每次 ≥ 30 分鐘</p>
-          <p><span class="num font-bold text-orange-600">7333</span>　規律運動（再加心跳達 130 bpm 或會喘）</p>
+      <div class="mt-5 bg-gradient-to-br from-orange-50/60 to-rose-50/40 border border-orange-100 rounded-xl p-4">
+        <p class="eyebrow text-orange-600 mb-3">運動強度分級說明（從寬到嚴）</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-xs">
+          <div class="bg-white/80 rounded-lg p-3 border border-slate-200">
+            <p class="font-bold text-slate-800 text-sm mb-1">有運動</p>
+            <p class="num text-[11px] text-slate-400 mb-1">代碼 7100</p>
+            <p class="text-slate-600 leading-relaxed">任何頻率都算，只要有動就計入。</p>
+          </div>
+          <div class="bg-white/80 rounded-lg p-3 border border-slate-200">
+            <p class="font-bold text-slate-800 text-sm mb-1">每週 3+ 次</p>
+            <p class="num text-[11px] text-slate-400 mb-1">代碼 7230</p>
+            <p class="text-slate-600 leading-relaxed">加上頻率門檻：每週至少運動 <span class="num font-semibold">3</span> 次。</p>
+          </div>
+          <div class="bg-white/80 rounded-lg p-3 border border-slate-200">
+            <p class="font-bold text-slate-800 text-sm mb-1">加 30 分鐘</p>
+            <p class="num text-[11px] text-slate-400 mb-1">代碼 7330</p>
+            <p class="text-slate-600 leading-relaxed">加上時長門檻：每次至少 <span class="num font-semibold">30</span> 分鐘。</p>
+          </div>
+          <div class="bg-gradient-to-br from-orange-100 to-rose-100 rounded-lg p-3 border-2 border-orange-300">
+            <p class="font-bold text-orange-800 text-sm mb-1">規律運動</p>
+            <p class="num text-[11px] text-orange-600/70 mb-1">代碼 7333 · 最嚴格</p>
+            <p class="text-slate-700 leading-relaxed">再加心率達 <span class="num font-semibold">130</span> bpm 或運動到會喘的程度。</p>
+          </div>
         </div>
-      </details>
+        <p class="text-[11px] text-slate-500 mt-3 leading-relaxed flex items-start gap-1.5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 text-slate-400 flex-shrink-0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>此分級對應 <strong class="text-slate-700">WHO 國際運動健康建議</strong>。「規律運動」為達到健康促進效益之最低標準，每週累計至少 <span class="num font-semibold">150</span> 分鐘中等強度有氧運動。</span>
+        </p>
+      </div>
     </section>
 
     <!-- ============ Tab: Trend ============ -->
@@ -441,10 +458,6 @@
           <div>
             <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-rose-500"></span>因果推論</p>
             <p>僅呈現相關性與差異，<span class="font-semibold text-slate-800">不代表因果</span>，不應作為政策制定唯一依據。</p>
-          </div>
-          <div>
-            <p class="font-bold text-slate-800 mb-1 flex items-center gap-1.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-500"></span>醫療免責</p>
-            <p><span class="font-semibold text-slate-800">非醫療診斷工具</span>，運動處方／復健建議請諮詢合格醫師或物理治療師。</p>
           </div>
         </div>
         <p class="mt-4 pt-3 border-t border-amber-100 text-[11px] text-slate-500">
