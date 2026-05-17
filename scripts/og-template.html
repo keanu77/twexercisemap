@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600;700&family=Fira+Sans:wght@700;900&family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 630px;
+    font-family: 'Fira Sans', 'Noto Sans TC', sans-serif;
+    overflow: hidden; position: relative;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,107,53,.25), transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(124,77,255,.22), transparent 45%),
+      radial-gradient(circle at 60% 100%, rgba(24,119,242,.15), transparent 50%),
+      linear-gradient(135deg, #fff7ed 0%, #fff1f2 50%, #f5f3ff 100%);
+  }
+  .container {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 60px 70px;
+  }
+  .top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .eyebrow {
+    font-size: 18px; font-weight: 700; letter-spacing: 0.16em;
+    color: #ea580c; text-transform: uppercase;
+  }
+  .brand-mark {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: linear-gradient(135deg, #ff6b35, #f43f5e 50%, #7c4dff);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 32px rgba(255,107,53,.35);
+  }
+  h1 {
+    font-size: 96px; font-weight: 900; line-height: 1; letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #ff6b35 0%, #f43f5e 45%, #7c4dff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-top: 18px;
+  }
+  .subtitle {
+    font-size: 28px; color: #475569; font-weight: 500;
+    margin-top: 18px; max-width: 920px; line-height: 1.4;
+  }
+  .stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    margin-top: 36px;
+  }
+  .stat {
+    background: rgba(255,255,255,.7); backdrop-filter: blur(8px);
+    border-radius: 16px; padding: 18px 22px;
+    border: 2px solid; position: relative; overflow: hidden;
+  }
+  .stat::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: var(--c);
+  }
+  .stat-1 { border-color: #fed7aa; --c: #ff6b35; }
+  .stat-2 { border-color: #e9d5ff; --c: #7c4dff; }
+  .stat-3 { border-color: #bae6fd; --c: #1877f2; }
+  .stat-label {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stat-1 .stat-label { color: #ea580c; }
+  .stat-2 .stat-label { color: #7c4dff; }
+  .stat-3 .stat-label { color: #1877f2; }
+  .stat-value {
+    font-family: 'Fira Code', 'Noto Sans TC', monospace;
+    font-size: 40px; font-weight: 700; color: #0f172a;
+    line-height: 1; letter-spacing: -0.02em;
+  }
+  .stat-1 .stat-value { color: #ea580c; }
+  .stat-2 .stat-value { color: #7c4dff; }
+  .stat-3 .stat-value { color: #1877f2; }
+  .stat-unit { font-size: 18px; color: #94a3b8; font-weight: 500; }
+  .stat-note { font-size: 13px; color: #64748b; margin-top: 4px; font-weight: 500; }
+  .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    color: #64748b; font-size: 15px; font-weight: 500;
+  }
+  .domain {
+    font-family: 'Fira Code', monospace; font-weight: 700;
+    color: #0f172a; font-size: 17px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 999px;
+    background: #fff; border: 1.5px solid #e2e8f0;
+    font-size: 14px; font-weight: 600; color: #475569;
+  }
+  .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <div class="top">
+        <div>
+          <p class="eyebrow">RUNNING CITIES TAIWAN · 22 縣市</p>
+          <h1>臺灣運動地圖</h1>
+          <p class="subtitle">從 22 縣市運動參與資料，看見臺灣人的運動習慣與城市差異</p>
+        </div>
+        <div class="brand-mark">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat stat-1">
+          <p class="stat-label">全國規律運動率</p>
+          <p class="stat-value">35.0<span class="stat-unit">%</span></p>
+          <p class="stat-note">7333 嚴格定義 / 112 年</p>
+        </div>
+        <div class="stat stat-2">
+          <p class="stat-label">第一名縣市</p>
+          <p class="stat-value">花蓮縣</p>
+          <p class="stat-note">40.8% 規律運動率</p>
+        </div>
+        <div class="stat stat-3">
+          <p class="stat-label">熱門運動 NO.1</p>
+          <p class="stat-value">健走</p>
+          <p class="stat-note">57.1% 民眾首選</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <span class="badge"><span class="badge-dot"></span>基於運動部 102–112 年開放資料 · 40,669 筆</span>
+      <span class="domain">twexercisemap.sportsmedicine.tw</span>
+    </div>
+  </div>
+</body>
+</html>
