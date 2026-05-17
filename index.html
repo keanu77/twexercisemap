@@ -235,11 +235,23 @@
     color: var(--accent, var(--c-brand));
   }
 
+  /* Map tab uses pink/rose color */
+  .tab-btn[data-tab="map"].active { background: linear-gradient(135deg, #ec4899, #f43f5e); --accent-shadow: rgba(244,63,94,.4); }
+
   /* Tabs */
   .tabs-wrap {
     display: inline-flex; padding: 4px; background: #fff;
     border: 1px solid var(--c-line); border-radius: 14px;
     box-shadow: 0 1px 2px rgba(15,23,42,.04);
+    max-width: 100%; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  .tabs-wrap::-webkit-scrollbar { height: 4px; }
+  .tabs-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+  @media (max-width: 640px) {
+    .tabs-wrap { width: 100%; }
+    .tab-btn { flex-shrink: 0; padding: 8px 12px; font-size: 13px; }
   }
   .tab-btn {
     display: inline-flex; align-items: center; gap: 6px;
@@ -397,18 +409,18 @@
         <div class="kpi-spark" aria-hidden="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         </div>
-        <p class="eyebrow text-violet-600 mb-2">十年成長</p>
-        <p class="num text-3xl font-bold text-slate-900 leading-none">+3.7<span class="text-base text-slate-400 font-medium"> pp</span></p>
-        <p class="text-[11px] text-slate-500 mt-1.5">102 → 112 · 點擊看趨勢 →</p>
+        <p class="eyebrow text-violet-600 mb-2">十年最大成長</p>
+        <p class="num text-3xl font-bold text-slate-900 leading-none">嘉義市</p>
+        <p class="text-[11px] text-slate-500 mt-1.5"><span class="num font-semibold text-violet-600">+17.4 pp</span>（21.4% → 38.8%）→</p>
       </button>
 
-      <button type="button" class="kpi text-left kpi-jump" data-jump="sports" style="--accent:#2eb872;--accent-soft:rgba(46,184,114,.12)" aria-label="跳至熱門運動">
+      <button type="button" class="kpi text-left kpi-jump" data-jump="levels" style="--accent:#1877f2;--accent-soft:rgba(24,119,242,.12)" aria-label="跳至強度漏斗">
         <div class="kpi-spark" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v6"/><circle cx="18" cy="18" r="3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
         </div>
-        <p class="eyebrow text-emerald-600 mb-2">熱門運動 No.1</p>
-        <p class="text-2xl font-bold text-slate-900 leading-none">健走</p>
-        <p class="text-[11px] text-slate-500 mt-1.5"><span class="num">57.1</span>% · 點擊看排行 →</p>
+        <p class="eyebrow text-blue-600 mb-2">漏斗流失最嚴重</p>
+        <p class="num text-3xl font-bold text-slate-900 leading-none">臺中市</p>
+        <p class="text-[11px] text-slate-500 mt-1.5"><span class="num font-semibold text-blue-600">−45.6 pp</span>（有動 78% → 規律 33%）→</p>
       </button>
 
     </section>
@@ -416,7 +428,11 @@
     <!-- Tabs -->
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div class="tabs-wrap" role="tablist">
-        <button class="tab-btn active" data-tab="ranking" role="tab" aria-selected="true">
+        <button class="tab-btn active" data-tab="map" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          地圖總覽
+        </button>
+        <button class="tab-btn" data-tab="ranking" role="tab" aria-selected="false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
           縣市排名
         </button>
@@ -437,7 +453,19 @@
     </div>
 
     <!-- ============ Tab: Ranking ============ -->
-    <section id="tab-ranking" class="tab-panel panel p-6 md:p-8">
+    <!-- ============ Tab: Map (choropleth) ============ -->
+    <section id="tab-map" class="tab-panel panel p-6 md:p-8">
+      <div class="mb-5">
+        <p class="eyebrow text-rose-600 mb-1.5">CHOROPLETH · YEAR 112</p>
+        <h2 class="section-title text-2xl">臺灣縣市規律運動率地圖</h2>
+        <p class="text-sm text-slate-500 mt-1">顏色越深代表規律運動率越高 · <span class="text-rose-600 font-semibold">點任一縣市開詳細資料</span></p>
+      </div>
+      <div id="chart-map" class="chart" style="height: 640px;"></div>
+      <div id="map-loading" class="text-center text-sm text-slate-400 py-4">載入地圖資料中…</div>
+    </section>
+
+    <!-- ============ Tab: Ranking ============ -->
+    <section id="tab-ranking" class="tab-panel panel p-6 md:p-8 hidden">
       <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-5 gap-4">
         <div>
           <p class="eyebrow text-orange-600 mb-1.5">22 COUNTIES · YEAR 112</p>
@@ -612,14 +640,7 @@
         <div class="flex items-center gap-2">
           <label for="county-select" class="eyebrow text-slate-500">縣市</label>
           <select id="county-select" class="select-input pl-3 py-1.5 rounded-lg border-2 border-blue-200 text-sm font-bold text-blue-700 bg-white cursor-pointer hover:border-blue-400 transition-colors">
-            <option value="花蓮縣">花蓮縣 (No.1)</option>
-            <option value="臺北市">臺北市</option>
-            <option value="新北市">新北市</option>
-            <option value="桃園市">桃園市</option>
-            <option value="臺中市">臺中市</option>
-            <option value="臺南市">臺南市</option>
-            <option value="高雄市">高雄市</option>
-            <option value="雲林縣" selected>雲林縣 (No.22)</option>
+            <!-- 動態由 app.js 注入 22 縣市，預設選「臺中市」-->
           </select>
         </div>
       </div>
@@ -629,7 +650,7 @@
     <!-- Keyboard shortcuts help -->
     <div class="mt-8 panel p-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-600">
       <span class="eyebrow text-slate-500">鍵盤快捷鍵</span>
-      <span class="flex items-center gap-1.5"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd> 切換分頁</span>
+      <span class="flex items-center gap-1.5"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd><kbd>5</kbd> 切換分頁</span>
       <span class="flex items-center gap-1.5"><kbd>←</kbd><kbd>→</kbd> 切換運動強度</span>
       <span class="flex items-center gap-1.5"><kbd>Space</kbd> 播放/暫停</span>
       <span class="flex items-center gap-1.5"><kbd>Esc</kbd> 關閉詳情</span>
