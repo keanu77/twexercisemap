@@ -1,39 +1,46 @@
 # Cloudflare Pages headers configuration
 # Docs: https://developers.cloudflare.com/pages/configuration/headers/
 
-# Long-cached immutable assets (Tailwind compiled CSS)
+# ============ Long-cached immutable assets ============
 /dist/*
   Cache-Control: public, max-age=31536000, immutable
-
-# HTML files: always revalidate to pick up content changes
-/*.html
-  Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
-  Referrer-Policy: strict-origin-when-cross-origin
 
-# Root path also gets HTML headers (since it serves index.html)
-/
-  Cache-Control: public, max-age=0, must-revalidate
+/og-image.png
+  Cache-Control: public, max-age=2592000
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
-  Referrer-Policy: strict-origin-when-cross-origin
 
-# SEO files: 1 day cache, must revalidate
+# ============ SEO files ============
 /robots.txt
   Cache-Control: public, max-age=86400, must-revalidate
   Content-Type: text/plain; charset=utf-8
+  X-Content-Type-Options: nosniff
 
 /sitemap.xml
   Cache-Control: public, max-age=86400, must-revalidate
   Content-Type: application/xml; charset=utf-8
+  X-Content-Type-Options: nosniff
 
 /llms.txt
   Cache-Control: public, max-age=86400, must-revalidate
   Content-Type: text/plain; charset=utf-8
-
-# Global security headers for everything else
-/*
   X-Content-Type-Options: nosniff
+
+# ============ Global security headers (apply to all) ============
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-site
+  X-DNS-Prefetch-Control: on
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+
+# ============ HTML pages: always revalidate ============
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
