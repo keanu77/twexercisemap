@@ -204,7 +204,7 @@
         臺灣運動地圖
       </h1>
       <p class="text-slate-600 text-lg sm:text-xl leading-relaxed">
-        從 <span class="num text-slate-700 font-bold">22</span> 縣市運動參與資料，看見臺灣人的運動習慣與城市差異。
+        從 <span class="num text-slate-700 font-bold">22</span> 縣市運動參與資料，看見臺灣人的運動習慣與城市差異
       </p>
     </header>
 
@@ -279,11 +279,12 @@
           </div>
           <button id="play-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-rose-500 text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer" aria-label="自動播放">
             <svg id="play-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span id="play-label">播放</span>
+            <span id="play-label">切換強度</span>
           </button>
         </div>
       </div>
-      <!-- Quick group filter chips -->
+
+      <!-- Quick group filter chips + Year race controls -->
       <div class="flex flex-wrap items-center gap-1.5 mb-4 pb-4 border-b border-slate-100">
         <span class="eyebrow text-slate-500 mr-2">快選</span>
         <button class="group-chip active" data-group="all">全部 22</button>
@@ -292,6 +293,49 @@
         <button class="group-chip" data-group="top5">前 5 名</button>
         <button class="group-chip" data-group="bottom5">後 5 名</button>
       </div>
+
+      <!-- Year race controls -->
+      <div class="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-xl bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-200">
+        <div class="flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-violet-600" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="eyebrow text-violet-700">歷年排名動畫</span>
+        </div>
+        <span class="text-xs text-slate-500 mr-1">追蹤縣市：</span>
+        <select id="race-county" class="select-input pl-3 pr-8 py-1.5 rounded-lg border-2 border-violet-200 text-xs font-bold text-violet-700 bg-white cursor-pointer hover:border-violet-400 transition-colors">
+          <option value="">－ 全部顯示 －</option>
+          <option value="花蓮縣">花蓮縣 (No.1)</option>
+          <option value="宜蘭縣">宜蘭縣</option>
+          <option value="臺北市" selected>臺北市</option>
+          <option value="新北市">新北市</option>
+          <option value="桃園市">桃園市</option>
+          <option value="臺中市">臺中市</option>
+          <option value="臺南市">臺南市</option>
+          <option value="高雄市">高雄市</option>
+          <option value="基隆市">基隆市</option>
+          <option value="新竹市">新竹市</option>
+          <option value="新竹縣">新竹縣</option>
+          <option value="苗栗縣">苗栗縣</option>
+          <option value="彰化縣">彰化縣</option>
+          <option value="南投縣">南投縣</option>
+          <option value="雲林縣">雲林縣 (No.22)</option>
+          <option value="嘉義市">嘉義市</option>
+          <option value="嘉義縣">嘉義縣</option>
+          <option value="屏東縣">屏東縣</option>
+          <option value="臺東縣">臺東縣</option>
+          <option value="澎湖縣">澎湖縣</option>
+          <option value="金門縣">金門縣</option>
+          <option value="連江縣">連江縣</option>
+        </select>
+        <button id="race-play" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer" type="button">
+          <svg id="race-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="race-label">播放歷年</span>
+        </button>
+        <div id="race-year-badge" class="hidden ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-bold">
+          <span class="opacity-70">YEAR</span>
+          <span id="race-year" class="num text-base">112</span>
+        </div>
+      </div>
+
       <div id="chart-ranking" class="chart"></div>
       <div class="mt-5 bg-gradient-to-br from-orange-50/60 to-rose-50/40 border border-orange-100 rounded-xl p-4">
         <p class="eyebrow text-orange-600 mb-3">運動強度分級說明（從寬到嚴）</p>
@@ -926,6 +970,146 @@ document.querySelectorAll('.group-chip').forEach(chip => {
     chip.classList.add('active');
     renderRanking(currentLevel, chip.dataset.group);
   });
+});
+
+// ============ Interaction G: Year race animation ============
+let raceTimer = null;
+let raceYearIdx = 0;
+let raceMode = false;
+let raceHighlight = '臺北市';
+
+function getRaceFrame(yearIdx) {
+  const rows = counties.map(c => {
+    const v = (trendData[c] || [])[yearIdx];
+    return [c, v == null ? 0 : v];
+  }).filter(r => r[1] > 0)
+    .sort((a,b) => b[1] - a[1]);
+  return rows;
+}
+
+function renderRaceFrame(yearIdx) {
+  const data = getRaceFrame(yearIdx).slice().reverse();
+  const year = years[yearIdx];
+  const yearBadge = document.getElementById('race-year');
+  if (yearBadge) yearBadge.textContent = year;
+  // Find rank of highlighted county
+  const sorted = getRaceFrame(yearIdx);
+  const rankIdx = raceHighlight ? sorted.findIndex(r => r[0] === raceHighlight) : -1;
+
+  const opt = {
+    grid: { left: 80, right: 110, top: 20, bottom: 20 },
+    tooltip: {
+      ...TOOLTIP_BASE, trigger: 'axis', axisPointer: { type: 'shadow' },
+      formatter: p => `<b>${p[0].name}</b><br/><span style="font-family:Fira Code,monospace;font-weight:600">${p[0].value}%</span>`
+    },
+    xAxis: {
+      type: 'value',
+      axisLabel: { ...AX, formatter: '{value}%' },
+      splitLine: SPLIT_LINE, axisLine: { show: false }, axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'category',
+      data: data.map(d => d[0]),
+      axisLabel: {
+        fontSize: 12, fontFamily: AX.fontFamily,
+        formatter: val => val === raceHighlight ? `{hi|★ ${val}}` : `{normal|${val}}`,
+        rich: {
+          hi: { color: '#7c4dff', fontWeight: 800, fontFamily: AX.fontFamily, fontSize: 12.5 },
+          normal: { color: '#334155', fontWeight: 500, fontFamily: AX.fontFamily, fontSize: 12 }
+        }
+      },
+      axisLine: { show: false }, axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => {
+        const isHighlight = d[0] === raceHighlight;
+        const isDimmed = raceHighlight && !isHighlight;
+        return {
+          value: d[1],
+          itemStyle: {
+            color: isHighlight
+              ? new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#7c4dff' },{ offset:1, color:'#a855f7' }])
+              : isDimmed
+                ? new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#e2e8f0' },{ offset:1, color:'#cbd5e1' }])
+                : new echarts.graphic.LinearGradient(0,0,1,0,[{ offset:0, color:'#ff6b35' },{ offset:1, color:'#f43f5e' }]),
+            borderRadius: [0,8,8,0],
+            shadowBlur: isHighlight ? 12 : 0,
+            shadowColor: isHighlight ? 'rgba(124,77,255,.45)' : 'transparent'
+          },
+          label: {
+            show: true, position: 'right',
+            formatter: isHighlight
+              ? `{c}% · 第 ${data.length - data.findIndex(x => x[0] === d[0])} 名`
+              : '{c}%',
+            color: isHighlight ? '#7c4dff' : (isDimmed ? '#94a3b8' : '#334155'),
+            fontWeight: isHighlight ? 800 : 600,
+            fontFamily: 'Fira Code, monospace',
+            fontSize: isHighlight ? 12.5 : 11
+          }
+        };
+      }),
+      barWidth: '60%',
+      animationDuration: 700,
+      animationEasing: 'cubicInOut'
+    }],
+    graphic: [{
+      type: 'text', right: 30, top: 10,
+      style: {
+        text: `民國 ${year} 年`,
+        font: 'bold 26px Fira Sans, "Noto Sans TC", sans-serif',
+        fill: 'rgba(124,77,255,.15)',
+        textAlign: 'right'
+      }
+    }]
+  };
+  if (!charts.ranking) charts.ranking = echarts.init(document.getElementById('chart-ranking'));
+  charts.ranking.setOption(opt, true);
+}
+
+function toggleRace() {
+  const raceIcon = document.getElementById('race-icon');
+  const raceLabel = document.getElementById('race-label');
+  const yearBadge = document.getElementById('race-year-badge');
+  if (raceTimer) {
+    // Stop
+    clearInterval(raceTimer); raceTimer = null; raceMode = false;
+    raceIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    raceLabel.textContent = '播放歷年';
+    yearBadge.classList.add('hidden');
+    // Restore normal ranking view
+    renderRanking(currentLevel, currentGroup);
+  } else {
+    // Start
+    raceMode = true;
+    raceYearIdx = 0;
+    yearBadge.classList.remove('hidden');
+    raceIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    raceLabel.textContent = '暫停';
+    renderRaceFrame(raceYearIdx);
+    raceTimer = setInterval(() => {
+      raceYearIdx = (raceYearIdx + 1) % years.length;
+      renderRaceFrame(raceYearIdx);
+      if (raceYearIdx === years.length - 1) {
+        // Last year — pause at end then stop
+        setTimeout(() => {
+          if (raceTimer) {
+            clearInterval(raceTimer); raceTimer = null;
+            const ic = document.getElementById('race-icon');
+            const lb = document.getElementById('race-label');
+            if (ic) ic.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+            if (lb) lb.textContent = '重播歷年';
+          }
+        }, 1800);
+      }
+    }, 1100);
+  }
+}
+
+document.getElementById('race-play').addEventListener('click', toggleRace);
+document.getElementById('race-county').addEventListener('change', e => {
+  raceHighlight = e.target.value;
+  if (raceMode) renderRaceFrame(raceYearIdx);
 });
 
 // ============ Interaction C: Auto-play level animation ============
