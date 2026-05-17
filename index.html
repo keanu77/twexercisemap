@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Fira+Sans:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<link href="./dist/output.css" rel="stylesheet">
+<link href="./dist/output.css?v=20260517d" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
   :root {
@@ -209,7 +209,7 @@
     </header>
 
     <!-- KPI Strip (clickable to jump to relevant tab) -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10" aria-label="關鍵指標">
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10" aria-label="關鍵指標">
       <button type="button" class="kpi text-left kpi-jump" data-jump="ranking" style="--accent:#ff6b35;--accent-soft:rgba(255,107,53,.12)" aria-label="跳至縣市排名">
         <div class="kpi-spark" aria-hidden="true">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
@@ -326,9 +326,11 @@
           <option value="金門縣">金門縣</option>
           <option value="連江縣">連江縣</option>
         </select>
-        <button id="race-play" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold shadow-md hover:shadow-lg active:scale-95 transition-all cursor-pointer" type="button">
-          <svg id="race-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          <span id="race-label">播放歷年</span>
+        <button id="race-play" type="button"
+          style="background: linear-gradient(90deg, #7c4dff 0%, #c026d3 100%); color: #fff;"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:shadow-xl active:scale-95 transition-all cursor-pointer whitespace-nowrap">
+          <svg id="race-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="race-label">播放歷年動畫</span>
         </button>
         <div id="race-year-badge" class="hidden ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-bold">
           <span class="opacity-70">YEAR</span>
