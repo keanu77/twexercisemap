@@ -4,3 +4,4 @@
 .env.local
 *.log
 node_modules/
+.vercel/
