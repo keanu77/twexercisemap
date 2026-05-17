@@ -1310,12 +1310,11 @@ async function renderMap() {
   if (!el) return;
   try {
     if (!charts._mapData) {
-      const res = await fetch("./data/taiwan-counties.geo.json", {
-        cache: "force-cache",
-      });
+      const res = await fetch("./data/taiwan-counties.geo.json");
       if (!res.ok) throw new Error("Map fetch failed " + res.status);
       charts._mapData = await res.json();
-      echarts.registerMap("taiwan", charts._mapData);
+      // ECharts 5.x 需要 { geoJSON: data } 而非直接傳 GeoJSON
+      echarts.registerMap("taiwan", { geoJSON: charts._mapData });
     }
     if (loading) loading.style.display = "none";
 
