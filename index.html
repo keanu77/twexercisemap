@@ -674,55 +674,66 @@
       </div>
     </details>
 
-    <!-- SEO/AEO 友善摘要區（給搜尋引擎與 AI 爬蟲讀的關鍵資訊） -->
-    <section class="mt-8 panel p-6 md:p-8" aria-labelledby="about-heading">
-      <p class="eyebrow text-orange-600 mb-2">ABOUT THIS PROJECT</p>
-      <h2 id="about-heading" class="section-title text-2xl mb-4">關於臺灣運動地圖</h2>
+    <!-- SEO/AEO 友善摘要區（給搜尋引擎與 AI 爬蟲讀的關鍵資訊；視覺上摺疊但 DOM 完整） -->
+    <details class="mt-8 group panel overflow-hidden" aria-labelledby="about-heading">
+      <summary class="cursor-pointer list-none px-5 py-4 flex items-center justify-between gap-3 hover:bg-orange-50/50 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center bg-orange-100 text-orange-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          </div>
+          <div>
+            <p class="eyebrow text-orange-600">ABOUT THIS PROJECT</p>
+            <p id="about-heading" class="font-bold text-slate-900 text-sm">關於臺灣運動地圖｜核心數據與常見問題</p>
+          </div>
+        </div>
+        <svg class="text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div class="px-5 pb-6 pt-1 border-t border-orange-100">
+        <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed space-y-4 pt-4">
+          <p>
+            <strong class="text-slate-900">臺灣運動地圖</strong>是一個基於<a href="https://data.gov.tw/dataset/24375" target="_blank" rel="noopener" class="text-orange-600 font-semibold hover:underline">中華民國運動部「運動城市調查各縣市規律運動現況」</a>開放資料集打造的互動式視覺化儀表板。資料涵蓋民國 <span class="num">102–112</span> 年（2013–2023），共 <span class="num">40,669</span> 筆民意調查紀錄，呈現臺灣 <span class="num">22</span> 縣市的運動參與、規律運動比例、熱門運動項目與歷年趨勢。
+          </p>
 
-      <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed space-y-4">
-        <p>
-          <strong class="text-slate-900">臺灣運動地圖</strong>是一個基於<a href="https://data.gov.tw/dataset/24375" target="_blank" rel="noopener" class="text-orange-600 font-semibold hover:underline">中華民國運動部「運動城市調查各縣市規律運動現況」</a>開放資料集打造的互動式視覺化儀表板。資料涵蓋民國 <span class="num">102–112</span> 年（2013–2023），共 <span class="num">40,669</span> 筆民意調查紀錄，呈現臺灣 <span class="num">22</span> 縣市的運動參與、規律運動比例、熱門運動項目與歷年趨勢。
-        </p>
+          <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">關鍵發現（民國 112 年）</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm">
+            <li>全國規律運動率（7333 嚴格定義）為 <strong class="num text-orange-600">35.0%</strong>，較民國 102 年（31.3%）成長 3.7 個百分點。</li>
+            <li><strong class="text-slate-900">花蓮縣</strong>以 <strong class="num text-orange-600">40.8%</strong> 居全國之冠，<strong class="text-slate-900">雲林縣</strong> <strong class="num">31.9%</strong> 居末，差距近 9 個百分點。</li>
+            <li>全國 <strong class="num">76.6%</strong> 民眾「有運動」，但只有 <strong class="num">35%</strong> 達到 WHO 國際建議標準。</li>
+            <li>最熱門運動項目為<strong class="text-slate-900">散步／健走</strong>（<span class="num">57.1%</span>）、<strong class="text-slate-900">慢跑</strong>（<span class="num">18.7%</span>）、<strong class="text-slate-900">爬山</strong>（<span class="num">12.3%</span>）。</li>
+          </ul>
 
-        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">關鍵發現（民國 112 年）</h3>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          <li>全國規律運動率（7333 嚴格定義）為 <strong class="num text-orange-600">35.0%</strong>，較民國 102 年（31.3%）成長 3.7 個百分點。</li>
-          <li><strong class="text-slate-900">花蓮縣</strong>以 <strong class="num text-orange-600">40.8%</strong> 居全國之冠，<strong class="text-slate-900">雲林縣</strong> <strong class="num">31.9%</strong> 居末，差距近 9 個百分點。</li>
-          <li>全國 <strong class="num">76.6%</strong> 民眾「有運動」，但只有 <strong class="num">35%</strong> 達到 WHO 國際建議標準。</li>
-          <li>最熱門運動項目為<strong class="text-slate-900">散步／健走</strong>（<span class="num">57.1%</span>）、<strong class="text-slate-900">慢跑</strong>（<span class="num">18.7%</span>）、<strong class="text-slate-900">爬山</strong>（<span class="num">12.3%</span>）。</li>
-        </ul>
+          <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">運動強度 4 種分級</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm">
+            <li><strong class="num text-slate-800">7100</strong> 有運動 — 任何頻率（76.6%）</li>
+            <li><strong class="num text-slate-800">7230</strong> 每週運動 ≥ 3 次（59.7%）</li>
+            <li><strong class="num text-slate-800">7330</strong> 加每次 ≥ 30 分鐘（45.7%）</li>
+            <li><strong class="num text-orange-600">7333</strong> 規律運動 — 加心率 130 bpm 或會喘（35.0%，對應 WHO 國際建議）</li>
+          </ul>
 
-        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">運動強度 4 種分級</h3>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          <li><strong class="num text-slate-800">7100</strong> 有運動 — 任何頻率（76.6%）</li>
-          <li><strong class="num text-slate-800">7230</strong> 每週運動 ≥ 3 次（59.7%）</li>
-          <li><strong class="num text-slate-800">7330</strong> 加每次 ≥ 30 分鐘（45.7%）</li>
-          <li><strong class="num text-orange-600">7333</strong> 規律運動 — 加心率 130 bpm 或會喘（35.0%，對應 WHO 國際建議）</li>
-        </ul>
+          <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">常見問題</h3>
+          <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+            <summary class="font-semibold text-slate-800 text-sm">臺灣全國規律運動率是多少？</summary>
+            <p class="mt-2 text-sm text-slate-600">民國 112 年全國達到「規律運動」標準（每週 ≥ 3 次、每次 ≥ 30 分鐘、心率達 130 bpm 或會喘）的人口為 <span class="num font-semibold">35.0%</span>。</p>
+          </details>
+          <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+            <summary class="font-semibold text-slate-800 text-sm">臺灣哪個縣市規律運動率最高？</summary>
+            <p class="mt-2 text-sm text-slate-600">花蓮縣 <span class="num font-semibold">40.8%</span> 居冠，其次為宜蘭縣 39.8%、連江縣 39.4%、臺北市 39.2%。</p>
+          </details>
+          <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
+            <summary class="font-semibold text-slate-800 text-sm">臺灣人最愛從事哪些運動？</summary>
+            <p class="mt-2 text-sm text-slate-600">前 5 名依序為：散步／健走（57.1%）、慢跑（18.7%）、爬山（12.3%）、騎自行車（10.7%）、在家健身訓練（10.7%）。</p>
+          </details>
+          <details class="bg-slate-50 rounded-lg p-3 cursor-pointer">
+            <summary class="font-semibold text-slate-800 text-sm">這份資料的限制是什麼？</summary>
+            <p class="mt-2 text-sm text-slate-600">資料採自我報告，可能存在社會期許偏誤；民國 108–110 年問卷口徑變動；95% 信賴區間下約 ±3–5pp 抽樣誤差；資料僅呈現相關性不代表因果。</p>
+          </details>
 
-        <h3 class="text-base font-bold text-slate-800 mt-5 mb-2">常見問題</h3>
-        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
-          <summary class="font-semibold text-slate-800 text-sm">臺灣全國規律運動率是多少？</summary>
-          <p class="mt-2 text-sm text-slate-600">民國 112 年全國達到「規律運動」標準（每週 ≥ 3 次、每次 ≥ 30 分鐘、心率達 130 bpm 或會喘）的人口為 <span class="num font-semibold">35.0%</span>。</p>
-        </details>
-        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
-          <summary class="font-semibold text-slate-800 text-sm">臺灣哪個縣市規律運動率最高？</summary>
-          <p class="mt-2 text-sm text-slate-600">花蓮縣 <span class="num font-semibold">40.8%</span> 居冠，其次為宜蘭縣 39.8%、連江縣 39.4%、臺北市 39.2%。</p>
-        </details>
-        <details class="bg-slate-50 rounded-lg p-3 mb-2 cursor-pointer">
-          <summary class="font-semibold text-slate-800 text-sm">臺灣人最愛從事哪些運動？</summary>
-          <p class="mt-2 text-sm text-slate-600">前 5 名依序為：散步／健走（57.1%）、慢跑（18.7%）、爬山（12.3%）、騎自行車（10.7%）、在家健身訓練（10.7%）。</p>
-        </details>
-        <details class="bg-slate-50 rounded-lg p-3 cursor-pointer">
-          <summary class="font-semibold text-slate-800 text-sm">這份資料的限制是什麼？</summary>
-          <p class="mt-2 text-sm text-slate-600">資料採自我報告，可能存在社會期許偏誤；民國 108–110 年問卷口徑變動；95% 信賴區間下約 ±3–5pp 抽樣誤差；資料僅呈現相關性不代表因果。</p>
-        </details>
-
-        <p class="text-xs text-slate-500 mt-5">
-          資料引用：中華民國運動部開放資料平台 · dataset 24375 · 政府資料開放授權條款 v1.0
-        </p>
+          <p class="text-xs text-slate-500 mt-5">
+            資料引用：中華民國運動部開放資料平台 · dataset 24375 · 政府資料開放授權條款 v1.0
+          </p>
+        </div>
       </div>
-    </section>
+    </details>
 
     <!-- Footer -->
     <footer class="mt-8 pt-6 border-t border-orange-100">
