@@ -1,0 +1,26 @@
+# Cloudflare Pages headers configuration
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+# Long-cached immutable assets (Tailwind compiled CSS)
+/dist/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML files: always revalidate to pick up content changes
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Root path also gets HTML headers (since it serves index.html)
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Global security headers for everything else
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()

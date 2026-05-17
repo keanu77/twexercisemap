@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+
+# Force trailing slash off
+/index.html / 301

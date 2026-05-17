@@ -1,0 +1,6 @@
+# Cloudflare Pages project configuration (optional, for CLI deploy)
+# Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "twexercisemap"
+compatibility_date = "2025-05-17"
+pages_build_output_dir = "."

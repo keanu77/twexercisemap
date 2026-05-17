@@ -28,18 +28,41 @@ npm run dev        # watch Tailwind
 # 用瀏覽器開啟 index.html
 ```
 
-## 部署到 Vercel
+## 部署
+
+本專案同時支援 **Vercel** 與 **Cloudflare Pages**，配置檔已備好，依需求擇一即可。
+
+### Option A：Vercel
 
 ```bash
 npx vercel         # 互動式部署
 # 或：推上 GitHub 後從 vercel.com import repo
 ```
 
-`vercel.json` 已設定：
-- `npm run build` 編譯 Tailwind CSS
-- 靜態資源 1 年 immutable cache
-- HTML 永遠重新驗證
-- 安全 headers（XCTO / Referrer-Policy / Permissions-Policy）
+`vercel.json` 已設定 build command、cache headers、安全 headers。
+
+### Option B：Cloudflare Pages（台灣 edge 速度較快、頻寬無上限）
+
+1. 前往 [dash.cloudflare.com](https://dash.cloudflare.com/) → Workers & Pages → Create → Pages
+2. Connect to Git → 選 `keanu77/twexercisemap`
+3. Build 設定：
+   - **Framework preset**: None
+   - **Build command**: `npm run build`
+   - **Build output directory**: `.`（根目錄）
+   - **Root directory**: `/`
+   - **Node version**: `20`（在 Environment variables 加 `NODE_VERSION=20`）
+4. Save and Deploy
+
+`_headers`、`_redirects`、`wrangler.toml` 已備好，Cloudflare 會自動套用。
+
+### CLI 部署 Cloudflare（選用）
+
+```bash
+npm install -g wrangler
+wrangler login
+npm run build
+wrangler pages deploy . --project-name=twexercisemap
+```
 
 ## 資料來源
 
